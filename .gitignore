@@ -1,3 +1,6 @@
+# Ignores api keys
+api.js
+
 # Logs
 logs
 *.log
