@@ -1,43 +1,84 @@
 'use client';
-import React, { useState } from "react";
-import { Typography, TextField, Button, Container, ThemeProvider } from "@mui/material";
+import React, { useState, useEffect, use } from "react";
+import { Typography, Container, CircularProgress } from "@mui/material";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../src/app/firebaseConfig";
-import theme from "../utils/theme";
+import { auth } from "../utils/firebaseConfig";
+import { FormControl, InputLabel, Input, Button } from "@mui/material";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
 
-    const handleLogin = async () => {
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            if (user) {
+                window.location.href = "/employeeLanding";
+            } else {
+                setLoading(false);
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    if (loading) {
+        return (
+            <Container maxWidth='sm' sx={{ marginTop: 5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <CircularProgress sx={{ marginBottom: 2 }} />
+            </Container>
+        );
+    }
+
+    const handleLogin = async (event) => {
+        event.preventDefault();
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            // Redirect to the desired page after successful login
+            window.location.href = "/employeeLanding";
         } catch (error) {
-            console.error("Error logging in:", error);
+            switch (error.code) {
+                case "auth/invalid-email":
+                    setError("Invalid email address.");
+                    break;
+                case "auth/invalid-credential":
+                    setError("Incorrect login details.");
+                    break;
+                case "auth/missing-password":
+                    setError("Invalid password.");
+                    break;
+                default:
+                    setError("Unknown error occurred. Please try again or contact support.");
+                    break;
+            }
         }
     };
 
     return (
-        <ThemeProvider theme={theme}>
-            <Container maxWidth='sm'>
-                <Typography variant="h4">Login</Typography>
-                <TextField
-                    label="Email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <TextField
-                    label="Password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <Button variant="contained" color="main" onClick={handleLogin}>
+        <Container maxWidth='sm' sx={{ marginTop: 5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Typography variant="h3" sx={{ marginBottom: 2 }}>Login</Typography>
+            {error && <Typography variant="body1" color="error" sx={{ marginBottom: 2 }}>{error}</Typography>}
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                <FormControl sx={{ marginBottom: 2, width: '60%' }}>
+                    <InputLabel>Email</InputLabel>
+                    <Input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </FormControl>
+                <FormControl sx={{ marginBottom: 2, width: '60%' }}>
+                    <InputLabel>Password</InputLabel>
+                    <Input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </FormControl>
+                <Button type="submit" variant="contained" sx={{ marginBottom: 2 }}>
                     Login
                 </Button>
-            </Container>
-        </ThemeProvider>
+            </form>
+        </Container>
     );
 }

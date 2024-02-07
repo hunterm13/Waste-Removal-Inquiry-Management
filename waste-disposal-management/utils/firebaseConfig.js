@@ -2,7 +2,7 @@
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
-import { API_KEY, PROJECT_ID, AUTH_DOMAIN, DATABASE_URL, STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from './api';
+import { API_KEY, PROJECT_ID, AUTH_DOMAIN, DATABASE_URL, STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '../src/app/api';
 
 // Initialize Firebase with your project's configuration
 const firebaseConfig = {
@@ -21,4 +21,5 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
 // Create an authentication reference
-export const auth = getAuth(app);
+const auth = getAuth(app);
+export { auth }
