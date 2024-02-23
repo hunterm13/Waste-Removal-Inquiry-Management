@@ -1,19 +1,20 @@
 import {useState, useEffect} from 'react';
 import  ProtectedRoute  from '../components/ProtectedRoute';
-import { CircularProgress, Container, Typography } from '@mui/material';
+import { Button, CircularProgress, Container, Typography } from '@mui/material';
 import { auth } from '../utils/firebaseConfig';
-import { getUserFirstName } from '../utils/queries';
+import { getUserFirstName, getDailyConversions } from '../utils/queries';
 import UserReportsTable from '../components/UserReportsTable';
 
 export default function EmployeeLanding() {
     const [firstName, setFirstName] = useState('');
     const [loading, setLoading] = useState(true);
     const [isAuthInitialized, setIsAuthInitialized] = useState(false);
+    const [dailyConversions, setDailyConversions] = useState(0);
 
     useEffect(() => {
         const unregisterAuthObserver = auth.onAuthStateChanged(user => {
-            if (isAuthInitialized && !auth.currentUser) {
-                return <Redirect to="/login" />;
+            if (isAuthInitialized || !auth.currentUser) {
+                window.location.href = '/login';
             }    
             setIsAuthInitialized(true);
             if (user) {
@@ -26,7 +27,16 @@ export default function EmployeeLanding() {
                         console.error('Error fetching user first name:', error);
                     }
                 };
+                const fetchDailyConversions = async () => {
+                    try {
+                        const response = await getDailyConversions(user.uid);
+                        setDailyConversions(response);
+                    } catch (error) {
+                        console.error('Error fetching daily conversions:', error);
+                    }
+                };
                 fetchUserFirstName();
+                fetchDailyConversions();
             }
         });
         return () => unregisterAuthObserver(); 
@@ -43,10 +53,16 @@ export default function EmployeeLanding() {
     }
     return (
         <ProtectedRoute>
-            <Container maxWidth="xl">
+            <Container maxWidth="xl" style={{marginBottom:'2rem'}}>
                 <Typography variant="h2" component="h1" align="center">
                     Welcome to the Employee Dashboard, {firstName}!
                 </Typography>
+                <Container maxWidth="xl" style={{display:'flex', justifyContent: 'space-between', margin: '2rem 0'}}>
+                    <Typography variant="h4" component="h2" align="left">
+                        Conversions for today: {dailyConversions}
+                    </Typography>
+                    <Button variant="contained" color="primary" href="/reporting">New Report</Button>
+                </Container>
                 <UserReportsTable uid={auth.currentUser.uid} />
             </Container>
         </ProtectedRoute>

@@ -2,7 +2,7 @@
 import React from 'react';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material';
-import { Raleway } from '@next/font/google';
+import { Raleway } from 'next/font/google';
 import  NavBar  from '../components/navBar';
 
 export const raleway = Raleway({
@@ -18,6 +18,9 @@ const theme = createTheme({
         },
         secondary: {
           main: '#ff6d00',
+        },
+        alert: {
+            main: '#ff0000',
         },
         background: {
             default: '#3b3a3a',

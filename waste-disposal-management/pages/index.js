@@ -1,19 +1,13 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Button, Container,  Typography } from '@mui/material';
-import { getUserFirstName } from '../utils/queries';
-import Link from 'next/link';
 
 export default function Home() {
   const [username, setUsername] = useState('');
 
-  useEffect(() => {
-    const fetchUsername = async () => {
-      const response = await getUserFirstName('IQrO6zmQkfQC3gcHdNt8iwmgKby2');
-      setUsername(response);
-    };
-    //fetchUsername();
-  }, []);
+  const handleNav = () => {
+    window.location.href = '/employeeLanding';
+  };
 
   return (
     <Container maxWidth="xl">
@@ -29,7 +23,7 @@ export default function Home() {
             <Typography variant="body1" component="p" align="center">
             Username: {username}
             </Typography>
-            <Button variant="contained" color="primary" component={Link} href="/employeeLanding">
+            <Button variant="contained" color="primary" onClick={handleNav}>
             Go to Landing
             </Button>
         </Container>
