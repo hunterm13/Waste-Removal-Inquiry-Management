@@ -13,19 +13,16 @@ export default function Home() {
     <Container maxWidth="xl">
         <Container maxWidth="md">
           <Typography variant="h2" component="h1" align="center">
-            Welcome to Unnamed Waste Disposal Company
+            Welcome to 310 Dump
             </Typography>
         </Container>
         <Container maxWidth="l">
             <Typography variant="body1" component="p" align="center">
-            We specialize in waste removal and management services.
+              <Button variant="contained" color="primary" onClick={handleNav}>
+                Go to Landing
+              </Button>
             </Typography>
-            <Typography variant="body1" component="p" align="center">
-            Username: {username}
-            </Typography>
-            <Button variant="contained" color="primary" onClick={handleNav}>
-            Go to Landing
-            </Button>
+            
         </Container>
     </Container>
   );
