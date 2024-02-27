@@ -28,7 +28,13 @@ export default function NewReport({ userID, reportType }) {
     }, [isFormDirty, isSubmitting]);
     
     const handleInputChange = (event, field) => {
-        setReport({ ...report, [field]: event.target.value });
+        setReport(prevReport => {
+            if(field === 'deliveryDate' || field === 'removalDate'){
+                return { ...prevReport, [field]: convertToDate(event) };
+            } else {
+                return { ...prevReport, [field]: event.target.value };
+            }
+        });
         setFormDirty(true);
     };
 
@@ -94,6 +100,13 @@ export default function NewReport({ userID, reportType }) {
                 return;
             }
         }
+        const phoneNumberArray = report.siteNumber.split(',').map(number => number.trim());
+        // Check if phone number array contains only numbers
+        const containsOnlyNumbers = phoneNumberArray.every(number => /^\d+$/.test(number));
+        if (!containsOnlyNumbers) {
+            setError("Phone number format is incorrect, please use numbers only and separate with commas");
+            return;
+        }
         const submitInsideSaleReport = async () => {
             await newReport(report, reportType);
             setFormDirty(false);
@@ -107,7 +120,7 @@ export default function NewReport({ userID, reportType }) {
         let day = newDate.getDate(); // Day of the month, from 1-31
         let month = newDate.getMonth() + 1; // Months are zero-based, so we add 1
         let year = newDate.getFullYear();
-        let formattedDate = `${day}/${month}/${year}`;
+        let formattedDate = `${month}/${day}/${year}`;
         return formattedDate;
     };
 
@@ -129,7 +142,7 @@ export default function NewReport({ userID, reportType }) {
     if (reportType === "insideSale") {
         return <>
             {error &&
-                <Alert severity='error' sx={{ marginBottom: 2 }}>
+                <Alert severity='error' sx={{ marginBottom: 2 }} onClose={() => setError('')}>
                     <AlertTitle>{error}</AlertTitle>
                 </Alert>
             }

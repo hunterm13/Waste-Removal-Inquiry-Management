@@ -13,8 +13,8 @@ export default function EmployeeLanding() {
 
     useEffect(() => {
         const unregisterAuthObserver = auth.onAuthStateChanged(user => {
-            if (isAuthInitialized || !auth.currentUser) {
-                //window.location.href = '/login';
+            if (!auth.currentUser) {
+                window.location.href = '/login';
             }    
             setIsAuthInitialized(true);
             if (user) {

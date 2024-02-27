@@ -35,9 +35,9 @@ export default function AllUserKpiTable () {
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell style={{width:'10%'}}>Name</TableCell>
-                        <TableCell style={{width:'80%'}}>Conversions</TableCell>
-                        <TableCell style={{width:'10%'}}>Inquiries</TableCell>
+                        <TableCell style={{width:'15%'}}>Name</TableCell>
+                        <TableCell style={{width:'75%'}}>Conversions</TableCell>
+                        <TableCell style={{width:'10%'}}></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

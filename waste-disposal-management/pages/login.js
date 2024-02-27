@@ -79,6 +79,7 @@ export default function Login() {
                     Login
                 </Button>
             </form>
+            <Typography variant="body2" sx={{ marginTop: 2 }}>New employee? <Button href="/signUp">Sign up here.</Button></Typography>
         </Container>
     );
 }

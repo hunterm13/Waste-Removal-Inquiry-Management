@@ -1,7 +1,8 @@
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from './firebaseConfig';
+import { db, auth } from './firebaseConfig';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { deleteDoc } from 'firebase/firestore';
+import { sendPasswordResetEmail, createUserWithEmailAndPassword } from 'firebase/auth';
 
 export const getUserFirstName = async (userId) => {
     try {
@@ -48,7 +49,9 @@ export const fetchUsers = async () => {
 
         const users = [];
         usersSnapshot.forEach((doc) => {
-            users.push(doc.data());
+            const userData = doc.data();
+            const userWithId = { id: doc.id, ...userData };
+            users.push(userWithId);
         });
 
         return users;
@@ -66,7 +69,6 @@ export const getAdminStatus = async (userId) => {
         if (userSnap.exists()) {
             const userData = userSnap.data();
             const isAdmin = userData.admin;
-            console.log('isAdmin:', isAdmin)
             return isAdmin;
         } else {
             throw new Error('User not found');
@@ -248,7 +250,7 @@ export const getUserKpi = async (userID) => {
 
     const querySnapshot = await getDocs(q);
     const totalInquiries = querySnapshot.size;
-    const totalConversions = querySnapshot.size - querySnapshot.docs.filter(doc => doc.data().leadTag === 'Follow Up' || !doc.data().leadTag).length;
+    const totalConversions = querySnapshot.size - querySnapshot.docs.filter(doc => doc.data().leadTag === 'Lost' || !doc.data().leadTag).length;
 
     return { totalInquiries, totalConversions };
 } 
@@ -257,7 +259,6 @@ export const getAllUserID = async () => {
     try {
         const usersRef = collection(db, 'Users');
         const usersSnapshot = await getDocs(usersRef);
-
         const users = [];
         usersSnapshot.forEach((doc) => {
             users.push(doc.id);
@@ -284,6 +285,118 @@ export const getUserLastName = async (userId) => {
         }
     } catch (error) {
         console.error('Error retrieving user:', error);
+        throw error;
+    }
+}
+
+export const createNewUser = async (userData, password) => {
+    if(!userData.email || !userData.firstName || !userData.lastName || !password) {
+        throw new Error('Required fields are missing');
+    }
+    userData.firstName = userData.firstName.trim().charAt(0).toUpperCase() + userData.firstName.trim().slice(1).toLowerCase();
+    userData.lastName = userData.lastName.trim().charAt(0).toUpperCase() + userData.lastName.trim().slice(1).toLowerCase();
+
+    try {
+        await createUserWithEmailAndPassword(auth, userData.email, password)
+            .then(async (userCredential) => {
+                const user = userCredential.user;
+                const userRef = collection(db, 'Users');
+                await setDoc(doc(userRef, user.uid), { ...userData });
+            });
+    } catch (error) {
+        if (error.code === 'auth/email-already-in-use') {
+            throw new Error('Email is already in use');
+        } else {
+            throw error;
+        }
+    }
+}
+
+export const disableUser = async (userId) => {
+    try {
+        const userRef = doc(db, 'Users', userId);
+        await setDoc(userRef, { active: false }, { merge: true });
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const deleteUserByID = async (userId) => {
+    try {
+        const userRef = doc(db, 'Users', userId);
+        await deleteDoc(userRef);
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getActiveStatus = async (userId) => {
+    try {
+        const userRef = doc(db, 'Users', userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const isActive = userData.active;
+            return isActive;
+        } else {
+            throw new Error('User not found');
+        }
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        throw error;
+    }
+}
+
+export const getUserDetails = async (userId) => {
+    try {
+        const userRef = doc(db, 'Users', userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            return userData;
+        } else {
+            throw new Error('User not found');
+        }
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        throw error;
+    }
+}
+
+export const enableUserByID = async (userId) => {
+    try {
+        const userRef = doc(db, 'Users', userId);
+        await setDoc(userRef, { active: true }, { merge: true });
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const disableUserByID = async (userId) => {
+    try {
+        const userRef = doc(db, 'Users', userId);
+        await setDoc(userRef, { active: false }, { merge: true });
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getAllReports = async () => {
+    try {
+        const reportsRef = collection(db, 'reports');
+        const reportsSnapshot = await getDocs(reportsRef);
+
+        const reports = [];
+        reportsSnapshot.forEach((doc) => {
+            const reportData = doc.data();
+            const reportWithId = { id: doc.id, ...reportData };
+            reports.push(reportWithId);
+        });
+        return reports;
+    } catch (error) {
+        console.error('Error retrieving reports:', error);
         throw error;
     }
 }

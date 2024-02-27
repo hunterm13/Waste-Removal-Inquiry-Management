@@ -1,21 +1,26 @@
-// Import the Firebase SDK
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
-import { API_KEY, PROJECT_ID, AUTH_DOMAIN, DATABASE_URL, STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '../src/app/api';
+import { initializeApp, getApps } from 'firebase/app';
 
 // Initialize Firebase with your project's configuration
 const firebaseConfig = {
-    apiKey: API_KEY,
-    projectId: PROJECT_ID,
-    authDomain: AUTH_DOMAIN,
-    databaseURL: DATABASE_URL,
-    storageBucket: STORAGE_BUCKET,
-    messagingSenderId: MESSAGING_SENDER_ID,
-    appId: APP_ID,
+    apiKey: process.env.NEXT_PUBLIC_API_KEY,
+    projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+    authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+    databaseURL: process.env.NEXT_PUBLIC_DATABASE_URL,
+    storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+let app;
+
+// Check if a Firebase app has already been initialized
+if (!getApps().length) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApps()[0]; // if already initialized, use that one
+}
 
 // Create a Firestore database reference
 export const db = getFirestore(app);

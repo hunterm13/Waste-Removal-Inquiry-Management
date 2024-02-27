@@ -12,7 +12,7 @@ const KpiSingleBar = ({ salesMade, totalInquiries}) => {
                     {salesMade} Conversions
                 </Typography>
                 <Typography variant="h6">
-                    {totalInquiries} Inquiries
+                    {totalInquiries} Total Inquiries
                 </Typography>
             </Container>
         </Box>

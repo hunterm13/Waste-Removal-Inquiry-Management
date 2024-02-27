@@ -22,6 +22,9 @@ const theme = createTheme({
         alert: {
             main: '#ff0000',
         },
+        tertiary: {
+            main: '#006400',
+        },
         background: {
             default: '#3b3a3a',
             paper: '#3d3d3d',

@@ -5,6 +5,7 @@ import { getReportById, getAdminStatus } from '../../utils/queries'
 import { auth } from '../../utils/firebaseConfig';
 import FrontLoadReport from '../../components/reportViews/FrontLoadReport';
 import OtherReport from '../../components/reportViews/OtherReport';
+import InsideSaleReport from '../../components/reportViews/InsideSaleReport';
 
 export default function Report() {
     const router = useRouter()
@@ -35,7 +36,6 @@ export default function Report() {
                     const reportData = await getReportById(reportID)
                     setReport(reportData)
                     setLoading(false)
-                    console.log(reportData)
                 } catch (error) {
                     console.error('Error fetching report:', error)
                 }
@@ -76,7 +76,13 @@ export default function Report() {
         );
     }
 
-    if (!report.reportType) {
+    if(report.service) {
+        return <>
+            <InsideSaleReport report={report} reportID={reportID} />
+        </>
+    }
+
+    if (!report.reportType && !report.service) {
         return (
             <Container maxWidth="xl">
                 <Typography variant="h2" component="h1" align="center">

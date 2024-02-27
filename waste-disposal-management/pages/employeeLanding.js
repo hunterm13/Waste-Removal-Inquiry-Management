@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react';
 import  ProtectedRoute  from '../components/ProtectedRoute';
 import { Button, CircularProgress, Container, Typography } from '@mui/material';
 import { auth } from '../utils/firebaseConfig';
-import { getUserFirstName, getDailyConversions } from '../utils/queries';
+import { getUserFirstName, getDailyConversions, getActiveStatus } from '../utils/queries';
 import UserReportsTable from '../components/UserReportsTable';
 
 export default function EmployeeLanding() {
@@ -10,6 +10,7 @@ export default function EmployeeLanding() {
     const [loading, setLoading] = useState(true);
     const [isAuthInitialized, setIsAuthInitialized] = useState(false);
     const [dailyConversions, setDailyConversions] = useState(0);
+    const [isActive, setIsActive] = useState(false);
 
     useEffect(() => {
         const unregisterAuthObserver = auth.onAuthStateChanged(user => {
@@ -21,6 +22,8 @@ export default function EmployeeLanding() {
                 const fetchUserFirstName = async () => {
                     try {
                         const response = await getUserFirstName(user.uid);
+                        const activeStatus = await getActiveStatus(user.uid);
+                        setIsActive(activeStatus);
                         setFirstName(response);
                         setLoading(false);
                     } catch (error) {
@@ -51,6 +54,17 @@ export default function EmployeeLanding() {
             </Container>
         );
     }
+
+    if (!isActive) {
+        return (
+            <Container maxWidth="xl">
+                <Typography variant="h2" component="h1" align="center">
+                    Your account is not active. Please contact an administrator.
+                </Typography>
+            </Container>
+        );
+    }
+
     return (
         <ProtectedRoute>
             <Container maxWidth="xl" style={{marginBottom:'2rem'}}>

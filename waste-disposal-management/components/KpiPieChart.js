@@ -3,24 +3,21 @@ import { Box, Typography } from '@mui/material';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
 
 const KpiPieChart = ({ values, totalInquiries }) => {
-    const [hoveredSegment, setHoveredSegment] = useState(null);
-
-    // Calculate the sum of values
-    const sumOfValues = values.reduce((sum, segment) => sum + segment[0], 0);
 
     // Add an empty segment representing the total inquiries
     const updatedValues = [...values];
 
     if (totalInquiries) {
-        updatedValues.push([totalInquiries - sumOfValues, 'Lost']);
+        updatedValues.push([totalInquiries, 'Lost/Other']);
     }
 
     // Define color mapping for labels
     const colorMapping = {
-        'Lost': 'lightcoral',
-        'Front Load': 'lightgreen',
-        'Swap': 'lightyellow',
-        'Roll Off': 'lightblue',
+        'Lost/Other': '#ff5833',
+        'Fencing': '#3583cc',
+        'Junk Removal': '#a879d5',
+        'Roll Off': '#ffa600',
+        'Portable Toilet': '#fb67ad'
     };
 
     // Prepare data for pie chart

@@ -1,4 +1,4 @@
-import { TableRow, TableCell, Container, CircularProgress, Typography, Table } from "@mui/material";
+import { TableRow, TableCell, Container, CircularProgress, Typography, Table, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getUserFirstName, getUserKpi, getUserLastName } from "../utils/queries";
 import KpiSingleBar from "./KpiSingleBar";
@@ -54,7 +54,16 @@ export default function KpiRow({userID}) {
         return <>
             <TableRow key={userID}>
                 <TableCell><Typography>{firstName} {lastName}</Typography></TableCell>
-                <TableCell><KpiSingleBar salesMade={conversions} totalInquiries={inquiries} /></TableCell>
+                <TableCell>
+                    {conversions && inquiries ? (
+                        <KpiSingleBar salesMade={conversions} totalInquiries={inquiries} />
+                    ) : (
+                        <Typography>Not yet</Typography>
+                    )}
+                </TableCell>
+                <TableCell>
+                    <Button variant="contained" color="primary" size="small" href={`/userKpi/${userID}`}>View</Button>
+                </TableCell>
             </TableRow>
         </>
     }    
