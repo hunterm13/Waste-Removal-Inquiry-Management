@@ -1,6 +1,6 @@
 import { Container, Typography, Button, Select, TextField, MenuItem, FormControl, InputLabel, RadioGroup, FormLabel, FormControlLabel, Radio, Alert, AlertTitle } from "@mui/material";
 import { useEffect, useState } from "react";
-import { deleteReportById, updateReportById } from "../../utils/queries";
+import { deleteReportById, updateReportById, getUserFirstName } from "../../utils/queries";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
@@ -9,6 +9,20 @@ export default function FrontLoadReport({report, reportID}) {
     const [reportData, setReportData] = useState(report);
     const [editing, setEditing] = useState(false);
     const [isFormDirty, setIsFormDirty] = useState(false);
+    const [error, setError] = useState("");
+    const [reportingUser, setReportingUser] = useState();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try{
+                const user = await getUserFirstName(reportData.userID);
+                setReportingUser(user);
+            } catch (error) {
+                console.error("Error fetching user details: ", error);
+            }
+        };
+        fetchUser();
+    }, []);
 
     const formatDateLocale = (date) => {
         const dateMilliseconds = date.seconds * 1000 + date.nanoseconds / 1000000;
@@ -75,6 +89,12 @@ export default function FrontLoadReport({report, reportID}) {
                 <Typography variant="body1" component="h2">Location: {reportData.city}, {reportData.siteAddress}</Typography>
                 <Typography variant="body1" component="h2">Contact Phone: {reportData.siteNumber}</Typography>
                 <Typography variant="body1" component="h2">Contact Name: {reportData.contactName}</Typography>
+                <Typography variant="body1" component="h2">Contact Email: {reportData.contactEmail}</Typography>
+                {reportData.howHear !== "Other" ? <Typography variant="body1" component="h2">How did they hear about us? {reportData.howHear}</Typography> : <Typography variant="body1" component="h2">How did you hear about us? {reportData.otherHear}</Typography>}
+                <Typography variant="body1" component="h2">Lead Channel: {reportData.leadChannel}</Typography>
+                <Typography variant="body1" component="h2">Lead Tag: {reportData.leadTag}</Typography>
+                {reportData.deliveryDate ? <Typography variant="body1" component="h2">Delivery Date: {reportData.deliveryDate}</Typography> : null}
+                {reportData.removalDate ? <Typography variant="body1" component="h2">Removal Date: {reportData.removalDate}</Typography> : null}
                 <Typography variant="body1" component="h2">Notes: {reportData.notes}</Typography>
             </Container>
             }
@@ -82,11 +102,13 @@ export default function FrontLoadReport({report, reportID}) {
                 <Button variant="contained" href="/employeeLanding">Back to Reports</Button>
                 <Container style={{margin:"0", width:"fit-content", display:"flex", gap:"1rem"}}>
                     {editing && <Button variant="contained" color="alert" onClick={handleCancel}>Cancel</Button>}
-                    <Button variant="contained" onClick={handleEdit}>{editing ? "Save" : "Edit"}</Button>                    
+                    <Button variant="contained" disabled onClick={handleEdit}>{editing ? "Save" : "Edit (coming soon)"}</Button>                    
                 </Container>
             </Container>
             <Typography variant="body1" style={{marginTop:"1rem"}} component="h2">Date Reported: {formattedDateReported}</Typography>
             {report.dateUpdated ? <Typography variant="body1" component="h2">Date Last Updated: {formattedDateUpdated}</Typography> : null}
+            <Typography variant="body1" component="h2">Report ID: {reportID}</Typography>
+            <Typography variant="body1" component="h2">Reported By: {reportingUser}</Typography>
         </Container>
     </>;
 }

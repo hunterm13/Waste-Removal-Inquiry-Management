@@ -291,7 +291,7 @@ export default function NewReport({ userID, reportType }) {
                             style={{ display: "flex", flexDirection: "row" }}
                         >
                             <FormControlLabel value="Phone" control={<Radio required={true}/>} label="Phone" />
-                            <FormControlLabel value="CMS" control={<Radio required={true}/>} label="CMS" />
+                            <FormControlLabel value="Email" control={<Radio required={true}/>} label="Email" />
                             <FormControlLabel value="Podium" control={<Radio required={true}/>} label="Podium" />
                         </RadioGroup>
                     </FormControl>
