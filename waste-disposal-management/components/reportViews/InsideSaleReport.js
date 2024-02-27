@@ -65,7 +65,7 @@ export default function FrontLoadReport({report, reportID}) {
                 <Typography variant="h2" style={{marginBottom:'2rem'}} component="h1">{report.service} Report Details</Typography>
                 <Button variant="contained" style={{height:'fit-content'}} onClick={handleDelete} color="alert">Delete Report</Button>
             </Container>
-            {editing ? <form>
+            {editing ? <form> 
 
             </form> : 
             <Container style={{display:'flex', flexDirection:'column', gap:'1rem'}}>
