@@ -1,12 +1,12 @@
-import {useState, useEffect} from 'react';
-import  ProtectedRoute  from '../components/ProtectedRoute';
-import { Button, CircularProgress, Container, Typography } from '@mui/material';
-import { auth } from '../utils/firebaseConfig';
-import { getUserFirstName, getDailyConversions, getActiveStatus } from '../utils/queries';
-import UserReportsTable from '../components/UserReportsTable';
+import {useState, useEffect} from "react";
+import  ProtectedRoute  from "../components/ProtectedRoute";
+import { Button, CircularProgress, Container, Typography } from "@mui/material";
+import { auth } from "../utils/firebaseConfig";
+import { getUserFirstName, getDailyConversions, getActiveStatus } from "../utils/queries";
+import UserReportsTable from "../components/UserReportsTable";
 
 export default function EmployeeLanding() {
-    const [firstName, setFirstName] = useState('');
+    const [firstName, setFirstName] = useState("");
     const [loading, setLoading] = useState(true);
     const [isAuthInitialized, setIsAuthInitialized] = useState(false);
     const [dailyConversions, setDailyConversions] = useState(0);
@@ -15,7 +15,7 @@ export default function EmployeeLanding() {
     useEffect(() => {
         const unregisterAuthObserver = auth.onAuthStateChanged(user => {
             if (isAuthInitialized || !auth.currentUser) {
-                window.location.href = '/login';
+                window.location.href = "/login";
             }    
             setIsAuthInitialized(true);
             if (user) {
@@ -27,7 +27,7 @@ export default function EmployeeLanding() {
                         setFirstName(response);
                         setLoading(false);
                     } catch (error) {
-                        console.error('Error fetching user first name:', error);
+                        console.error("Error fetching user first name:", error);
                     }
                 };
                 const fetchDailyConversions = async () => {
@@ -35,7 +35,7 @@ export default function EmployeeLanding() {
                         const response = await getDailyConversions(user.uid);
                         setDailyConversions(response);
                     } catch (error) {
-                        console.error('Error fetching daily conversions:', error);
+                        console.error("Error fetching daily conversions:", error);
                     }
                 };
                 fetchUserFirstName();
@@ -67,11 +67,11 @@ export default function EmployeeLanding() {
 
     return (
         <ProtectedRoute>
-            <Container maxWidth="xl" style={{marginBottom:'2rem'}}>
+            <Container maxWidth="xl" style={{marginBottom:"2rem"}}>
                 <Typography variant="h2" component="h1" align="center">
                     Welcome to the Employee Dashboard, {firstName}!
                 </Typography>
-                <Container maxWidth="xl" style={{display:'flex', justifyContent: 'space-between', margin: '2rem 0'}}>
+                <Container maxWidth="xl" style={{display:"flex", justifyContent: "space-between", margin: "2rem 0"}}>
                     <Typography variant="h4" component="h2" align="left">
                         Conversions for today: {dailyConversions}
                     </Typography>

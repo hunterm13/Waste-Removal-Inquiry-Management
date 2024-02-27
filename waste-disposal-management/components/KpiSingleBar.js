@@ -1,13 +1,13 @@
-import React from 'react';
-import { Box, LinearProgress, Container, Typography } from '@mui/material';
+import React from "react";
+import { Box, LinearProgress, Container, Typography } from "@mui/material";
 
 const KpiSingleBar = ({ salesMade, totalInquiries}) => {
     const progress = (salesMade / totalInquiries) * 100;
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: "100%" }}>
             <LinearProgress variant="determinate" value={progress} />
-            <Container maxWidth="lg" sx={{display: 'flex', justifyContent: 'space-between'}}>
+            <Container maxWidth="lg" sx={{display: "flex", justifyContent: "space-between"}}>
                 <Typography variant="h6">
                     {salesMade} Conversions
                 </Typography>

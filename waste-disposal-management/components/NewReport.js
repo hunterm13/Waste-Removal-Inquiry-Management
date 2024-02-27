@@ -16,20 +16,20 @@ export default function NewReport({ userID, reportType }) {
         const handleBeforeUnload = (event) => {
             if (isFormDirty && !isSubmitting) {
             event.preventDefault();
-            event.returnValue = '';
+            event.returnValue = "";
             }
         };
     
-        window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener("beforeunload", handleBeforeUnload);
     
         return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener("beforeunload", handleBeforeUnload);
         };
     }, [isFormDirty, isSubmitting]);
     
     const handleInputChange = (event, field) => {
         setReport(prevReport => {
-            if(field === 'deliveryDate' || field === 'removalDate'){
+            if(field === "deliveryDate" || field === "removalDate"){
                 return { ...prevReport, [field]: convertToDate(event) };
             } else {
                 return { ...prevReport, [field]: event.target.value };
@@ -100,7 +100,7 @@ export default function NewReport({ userID, reportType }) {
                 return;
             }
         }
-        const phoneNumberArray = report.siteNumber.split(',').map(number => number.trim());
+        const phoneNumberArray = report.siteNumber.split(",").map(number => number.trim());
         // Check if phone number array contains only numbers
         const containsOnlyNumbers = phoneNumberArray.every(number => /^\d+$/.test(number));
         if (!containsOnlyNumbers) {
@@ -110,7 +110,7 @@ export default function NewReport({ userID, reportType }) {
         const submitInsideSaleReport = async () => {
             await newReport(report, reportType);
             setFormDirty(false);
-            window.location.href = '/employeeLanding';
+            window.location.href = "/employeeLanding";
         };
         submitInsideSaleReport();
     };
@@ -131,29 +131,29 @@ export default function NewReport({ userID, reportType }) {
             try {
                 await newReport(report, reportType);
                 setFormDirty(false);
-                window.location.href = '/employeeLanding';
+                window.location.href = "/employeeLanding";
             } catch (error) {
-                console.log(error)
+                console.log(error);
             }            
-        }
+        };
         submitOtherReport();
     };    
 
     if (reportType === "insideSale") {
         return <>
             {error &&
-                <Alert severity='error' sx={{ marginBottom: 2 }} onClose={() => setError('')}>
+                <Alert severity='error' sx={{ marginBottom: 2 }} onClose={() => setError("")}>
                     <AlertTitle>{error}</AlertTitle>
                 </Alert>
             }
             <form onSubmit={handleSubmitInside}>
-                <Container maxWidth="lg" style={{ display: 'flex', justifyContent: 'flex-start', gap: '2rem', padding: '0' }}>
-                    <FormControl sx={{width:'20%'}}>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", padding: "0" }}>
+                    <FormControl sx={{width:"20%"}}>
                         <InputLabel id="service">Service *</InputLabel>
                         <Select 
                             required 
-                            onChange={(event) => handleInputChange(event, 'service')}
-                            label={'Service'}
+                            onChange={(event) => handleInputChange(event, "service")}
+                            label={"Service"}
                             labelId="service"
                             value={report.service}
                         >
@@ -163,10 +163,10 @@ export default function NewReport({ userID, reportType }) {
                             <MenuItem value="Fencing">Fencing</MenuItem>
                         </Select>
                     </FormControl>
-                    <FormControl  sx={{width:'20%'}}>
-                        <InputLabel id="workFlow">{report.workFlow || 'Work Flow'}</InputLabel>
+                    <FormControl  sx={{width:"20%"}}>
+                        <InputLabel id="workFlow">{report.workFlow || "Work Flow"}</InputLabel>
                         <Select
-                            label={'Work Flow'}
+                            label={"Work Flow"}
                             labelId="workFlow"
                             value={report.workFlow}
                             disabled
@@ -177,15 +177,15 @@ export default function NewReport({ userID, reportType }) {
                             <MenuItem value="DELFE">DELFE</MenuItem>
                         </Select>
                     </FormControl>
-                    {report.service === "Roll Off" ? <FormControl style={{display:'flex', flexWrap:'nowrap', flexDirection:'row', alignItems:'center', gap:'1rem'}} sx={{width:'50%'}}>
+                    {report.service === "Roll Off" ? <FormControl style={{display:"flex", flexWrap:"nowrap", flexDirection:"row", alignItems:"center", gap:"1rem"}} sx={{width:"50%"}}>
                         <FormLabel id="binSize">Bin Size (Yards) * :</FormLabel>
                         <RadioGroup
-                            label={'Bin Size (Yards)'}
+                            label={"Bin Size (Yards)"}
                             labelId="binSize"
                             value={report.binSize}
                             required
-                            style={{ display: 'flex', flexDirection: 'row' }}
-                            onChange={(event) => handleInputChange(event, 'binSize')}
+                            style={{ display: "flex", flexDirection: "row" }}
+                            onChange={(event) => handleInputChange(event, "binSize")}
                         >
                             <FormControlLabel value="10" control={<Radio/>} label="10" />
                             <FormControlLabel value="15" control={<Radio/>} label="15" />
@@ -194,78 +194,78 @@ export default function NewReport({ userID, reportType }) {
                         </RadioGroup>
                     </FormControl>: null}
                 </Container>
-                <Container maxWidth="lg" style={{ display: 'flex', justifyContent: 'flex-start', gap: '2rem', marginTop: '1rem', padding: '0' }}>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding: "0" }}>
                     
-                    <FormControl  sx={{width:'25%'}}>
+                    <FormControl  sx={{width:"25%"}}>
                         <InputLabel id="region">Region *</InputLabel>
                         <Select 
                             required id="region"
                             value={report.region}
-                            onChange={(event) => handleInputChange(event, 'region')}
-                            label={'Region'}
+                            onChange={(event) => handleInputChange(event, "region")}
+                            label={"Region"}
                             labelId="region"                            
                         >
                             <MenuItem value="Edmonton">Edmonton</MenuItem>
                             <MenuItem value="Calgary">Calgary</MenuItem>
                         </Select>
                     </FormControl>
-                    <FormControl  sx={{width:'40%'}}>
+                    <FormControl  sx={{width:"40%"}}>
                         <TextField
                             required
                             label="Address"
                             value={report.siteAddress}
-                            onChange={(event) => handleInputChange(event, 'siteAddress')}
+                            onChange={(event) => handleInputChange(event, "siteAddress")}
                         />
                     </FormControl>
-                    <FormControl  sx={{width:'25%'}}>
+                    <FormControl  sx={{width:"25%"}}>
                         <TextField
                             required
                             label="City"
                             value={report.city}
-                            onChange={(event) => handleInputChange(event, 'city')}
+                            onChange={(event) => handleInputChange(event, "city")}
                         />
                     </FormControl>                    
                 </Container>
-                <Container maxWidth="lg" style={{ display: 'flex', justifyContent: 'flex-start', gap: '2rem', marginTop: '1rem', padding:'0' }}>
-                    <FormControl  sx={{width:'30%'}}>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding:"0" }}>
+                    <FormControl  sx={{width:"30%"}}>
                         <TextField
                             required
                             helperText="Numbers only, use comma to separate."
                             label="Contact Number"
                             value={report.siteNumber}
-                            onChange={(event) => handleInputChange(event, 'siteNumber')}
+                            onChange={(event) => handleInputChange(event, "siteNumber")}
                         />
                     </FormControl>
-                    <FormControl  sx={{width:'30%'}}>
+                    <FormControl  sx={{width:"30%"}}>
                         <TextField
                             label="Contact Name"
                             value={report.contactName}
-                            onChange={(event) => handleInputChange(event, 'contactName')}
+                            onChange={(event) => handleInputChange(event, "contactName")}
                         />
                     </FormControl>
-                    <FormControl  sx={{width:'30%'}}>
+                    <FormControl  sx={{width:"30%"}}>
                         <TextField
                             required
                             label="Contact Email"
                             value={report.contactEmail}
-                            onChange={(event) => handleInputChange(event, 'contactEmail')}
+                            onChange={(event) => handleInputChange(event, "contactEmail")}
                         />
                     </FormControl>
                 </Container>
-                <Container maxWidth="lg" style={{ display: 'flex', justifyContent: 'flex-start', gap: '2rem', marginTop: '1rem', padding:'0'}}>
-                    <FormControl  sx={{width:'30%'}}>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding:"0"}}>
+                    <FormControl  sx={{width:"30%"}}>
                         <TextField
                             required
                             label="Site Name"
                             value={report.siteName}
-                            onChange={(event) => handleInputChange(event, 'siteName')}
+                            onChange={(event) => handleInputChange(event, "siteName")}
                         />
                     </FormControl>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="Delivery Date"
                             format="MM/DD/YYYY"
-                            onChange={(date) => handleInputChange(date, 'deliveryDate')}
+                            onChange={(date) => handleInputChange(date, "deliveryDate")}
                             disablePast
                             value={report.deliveryDate || null}
                         />                        
@@ -276,33 +276,33 @@ export default function NewReport({ userID, reportType }) {
                             format="MM/DD/YYYY"
                             value={report.removalDate || null}
                             disablePast
-                            onChange={(date) => handleInputChange(date, 'removalDate')}
+                            onChange={(date) => handleInputChange(date, "removalDate")}
                         />
                     </LocalizationProvider>
                 </Container>
-                <Container maxWidth="lg" style={{ display: 'flex', justifyContent: 'flex-start', gap: '2rem', marginTop: '1rem', padding:'0' }}>
-                    <FormControl component="fieldset" sx={{ width: '30%' }}>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding:"0" }}>
+                    <FormControl component="fieldset" sx={{ width: "30%" }}>
                         <FormLabel component="legend">Lead Channel</FormLabel>
                         <RadioGroup
                             aria-label="Lead Channel"
                             name="leadChannel"
                             value={report.leadChannel}
-                            onChange={(event) => handleInputChange(event, 'leadChannel')}
-                            style={{ display: 'flex', flexDirection: 'row' }}
+                            onChange={(event) => handleInputChange(event, "leadChannel")}
+                            style={{ display: "flex", flexDirection: "row" }}
                         >
                             <FormControlLabel value="Phone" control={<Radio required={true}/>} label="Phone" />
                             <FormControlLabel value="CMS" control={<Radio required={true}/>} label="CMS" />
                             <FormControlLabel value="Podium" control={<Radio required={true}/>} label="Podium" />
                         </RadioGroup>
                     </FormControl>
-                    <FormControl sx={{ width: '30%' }}>
+                    <FormControl sx={{ width: "30%" }}>
                         <FormLabel component="legend">Lead Tag</FormLabel>
                         <RadioGroup
                             aria-label="Lead Tags"
                             name="leadTags"
                             value={report.leadTag}
-                            onChange={(event) => handleInputChange(event, 'leadTag')}
-                            style={{ display: 'flex', flexDirection: 'row' }}
+                            onChange={(event) => handleInputChange(event, "leadTag")}
+                            style={{ display: "flex", flexDirection: "row" }}
                         >
                             <FormControlLabel value="Follow Up" control={<Radio required={true}/>} label="Follow Up" />
                             <FormControlLabel value="Booked" control={<Radio required={true}/>} label="Booked" />
@@ -310,19 +310,19 @@ export default function NewReport({ userID, reportType }) {
                         </RadioGroup>
                     </FormControl>
                 </Container>
-                <Container maxWidth="lg" style={{padding:'0', marginTop:'1rem'}}>
-                    <FormControl sx={{ width: '100%' }}>
+                <Container maxWidth="lg" style={{padding:"0", marginTop:"1rem"}}>
+                    <FormControl sx={{ width: "100%" }}>
                         <TextField
                             required
                             multiline
                             label="Notes"
                             value={report.notes}
-                            onChange={(event) => handleInputChange(event, 'notes')}
+                            onChange={(event) => handleInputChange(event, "notes")}
                         />
                     </FormControl>
                 </Container>
-                <Container maxWidth="lg" style={{ display: 'flex', justifyContent: 'flex-start', gap: '2rem', marginTop: '1rem', padding: '0' }}>
-                    <FormControl sx={{ width: '25%' }}>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding: "0" }}>
+                    <FormControl sx={{ width: "25%" }}>
                         <InputLabel id="how-hear-label">How did they hear about us?</InputLabel>
                         <Select
                             labelId="how-hear-label"
@@ -330,7 +330,7 @@ export default function NewReport({ userID, reportType }) {
                             label="How did they hear about us?"
                             required
                             value={report.howHear}
-                            onChange={(event) => handleInputChange(event, 'howHear')}
+                            onChange={(event) => handleInputChange(event, "howHear")}
                         >
                             <MenuItem value="kijiji">Kijiji</MenuItem>
                             <MenuItem value="facebook">Facebook</MenuItem>
@@ -340,21 +340,21 @@ export default function NewReport({ userID, reportType }) {
                         </Select>
                     </FormControl>
                     {report.howHear === "other" && (
-                    <FormControl sx={{ width: '40%' }}>
+                    <FormControl sx={{ width: "40%" }}>
                         <TextField
                         required
                         label="Other"
                         value={report.otherHowHear}
-                        onChange={(event) => handleInputChange(event, 'otherHowHear')}
+                        onChange={(event) => handleInputChange(event, "otherHowHear")}
                         />
                     </FormControl>
                     )} 
                 </Container>   
-                <Container maxWidth="lg" style={{ display: 'flex', justifyContent: 'space-between', gap: '2rem', marginTop: '1rem', padding: '0'}}>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "space-between", gap: "2rem", marginTop: "1rem", padding: "0"}}>
                     <Button type="submit" variant="contained" sx={{ marginBottom: 2 }}>Submit</Button>
                 </Container>
             </form>
-        </>        
+        </>;        
     } else if (reportType === "Front Load") {
         return <>
             {error &&
@@ -363,22 +363,22 @@ export default function NewReport({ userID, reportType }) {
                 </Alert>
             }
             <form onSubmit={handleSubmitOther}>
-                <Container maxWidth="lg" style={{padding:'0'}}>
-                    <FormControl sx={{ width: '100%' }}>
+                <Container maxWidth="lg" style={{padding:"0"}}>
+                    <FormControl sx={{ width: "100%" }}>
                         <TextField
                             required
                             multiline
                             label="Notes"
                             value={report.notes}
-                            onChange={(event) => handleInputChange(event, 'notes')}
+                            onChange={(event) => handleInputChange(event, "notes")}
                         />
                     </FormControl>
                 </Container>
-                <Container maxWidth="lg" style={{ display: 'flex', justifyContent: 'flex-start', gap: '2rem', marginTop: '1rem', padding: '0' }}>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding: "0" }}>
                     <Button type="submit" variant="contained" sx={{ marginBottom: 2 }}>Submit</Button>
                 </Container>
             </form>
-        </>
+        </>;
     } else if (reportType === "Swap" || reportType === "Other" || reportType === "Removal") {
         return <>
             {error &&
@@ -387,29 +387,29 @@ export default function NewReport({ userID, reportType }) {
                 </Alert>
             }
             <form onSubmit={handleSubmitOther}>
-                <Container maxWidth="lg" style={{paddingLeft:'0'}}>
-                    <FormControl sx={{ width: '30%', margin:'0 0 1rem 0' }}>
+                <Container maxWidth="lg" style={{paddingLeft:"0"}}>
+                    <FormControl sx={{ width: "30%", margin:"0 0 1rem 0" }}>
                         <TextField
                             required
                             label="Site Phone Number"
                             value={report.siteNumber}
-                            onChange={(event) => handleInputChange(event, 'siteNumber')}
+                            onChange={(event) => handleInputChange(event, "siteNumber")}
                         />
                     </FormControl>
-                    <FormControl sx={{ width: '100%' }}>
+                    <FormControl sx={{ width: "100%" }}>
                         <TextField
                             required
                             multiline
                             label="Notes"
                             value={report.notes}
-                            onChange={(event) => handleInputChange(event, 'notes')}
+                            onChange={(event) => handleInputChange(event, "notes")}
                         />
                     </FormControl>
                 </Container>
-                <Container maxWidth="lg" style={{ display: 'flex', justifyContent: 'flex-start', gap: '2rem', marginTop: '1rem', padding:'0' }}>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding:"0" }}>
                     <Button type="submit" variant="contained" sx={{ marginBottom: 2 }}>Submit</Button>
                 </Container>
             </form>
-        </>
+        </>;
     }
 }

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Container, Typography, Button, Select, MenuItem } from '@mui/material';
-import { getAdminStatus, fetchUsers, enableUserByID, disableUserByID } from '../utils/queries';
-import { auth } from '../utils/firebaseConfig';
+import React, { useEffect, useState } from "react";
+import { TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Container, Typography, Button, Select, MenuItem } from "@mui/material";
+import { getAdminStatus, fetchUsers, enableUserByID, disableUserByID } from "../utils/queries";
+import { auth } from "../utils/firebaseConfig";
 
 export default function AdminPage() {
     const [users, setUsers] = useState(null);
@@ -12,7 +12,7 @@ export default function AdminPage() {
     useEffect(() => {
         const unregisterAuthObserver = auth.onAuthStateChanged(async user => {
             if (!auth.currentUser) {
-                window.location.href = '/login';
+                window.location.href = "/login";
             }    
             setIsAuthInitialized(true);
             if (user) {
@@ -21,7 +21,7 @@ export default function AdminPage() {
                 setUsers(userQuery);
                 setIsAdmin(adminStatus);
                 setLoading(false);
-                console.log(userQuery)
+                console.log(userQuery);
             }
         });
         return () => unregisterAuthObserver(); 
@@ -40,11 +40,11 @@ export default function AdminPage() {
             );
             setUsers(updatedUsers);
         }
-    }
+    };
 
     const handleDisable = (userID, admin) => {
         if(admin){
-            alert('You cannot disable an admin user');
+            alert("You cannot disable an admin user");
         } else {
             const confirmDisable = window.confirm("Are you sure you want to disable this user?");
             if (confirmDisable) {
@@ -59,7 +59,7 @@ export default function AdminPage() {
                 setUsers(updatedUsers);
             }
         }
-    }
+    };
 
     if (!isAuthInitialized || loading) {
         return (
@@ -70,13 +70,13 @@ export default function AdminPage() {
     } else if (isAdmin) {
         return (
                 <Container maxWidth="lg" style={{padding:0}}>
-                    <Typography variant="h2" style={{marginBottom:'1rem'}} component="h1" align="center">
+                    <Typography variant="h2" style={{marginBottom:"1rem"}} component="h1" align="center">
                         User Management
                     </Typography>
-                    <Container style={{marginBottom:'1rem', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                    <Container style={{marginBottom:"1rem", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
                         <Container style={{padding:0}}>
                             <TextField label="Search" variant="outlined" />
-                            <Select style={{marginLeft:'1rem'}}>
+                            <Select style={{marginLeft:"1rem"}}>
                                 <MenuItem value='firstName'>First Name</MenuItem>
                                 <MenuItem value='lastName'>Last Name</MenuItem>
                                 <MenuItem value='email'>Email</MenuItem>                                
@@ -85,7 +85,7 @@ export default function AdminPage() {
                         <Button 
                             variant='contained'
                             color='primary'
-                            style={{ textWrap:'nowrap', height:'fit-content' }}
+                            style={{ textWrap:"nowrap", height:"fit-content" }}
                             href='/newUser'
                         >
                             Add User
@@ -97,9 +97,9 @@ export default function AdminPage() {
                                 <TableRow>
                                     <TableCell>First Name</TableCell>
                                     <TableCell>Last Name</TableCell>
-                                    <TableCell style={{width:'10%'}}>Active</TableCell>
-                                    <TableCell style={{width:'10%'}}>Admin</TableCell>
-                                    <TableCell style={{width:'10%'}}></TableCell>
+                                    <TableCell style={{width:"10%"}}>Active</TableCell>
+                                    <TableCell style={{width:"10%"}}>Admin</TableCell>
+                                    <TableCell style={{width:"10%"}}></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -113,10 +113,10 @@ export default function AdminPage() {
                                         <TableCell>
                                             <input type="checkbox" checked={user.admin} disabled/>
                                         </TableCell>
-                                        <TableCell style={{width:'10%'}}>
+                                        <TableCell style={{width:"10%"}}>
                                             <Button variant="contained" color="primary" href={`/user/${user.id}`}>Edit</Button>
                                         </TableCell>
-                                        <TableCell style={{width:'10%'}}>
+                                        <TableCell style={{width:"10%"}}>
                                             {!user.active ? <Button variant="contained" color="tertiary" onClick={() => handleEnable(user.id)}>Enable</Button>:
                                              <Button variant="contained" color="secondary" onClick={() => handleDisable(user.id, user.admin)} >Disable</Button>}
                                         </TableCell>

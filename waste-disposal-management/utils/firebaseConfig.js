@@ -1,6 +1,6 @@
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { initializeApp, getApps } from "firebase/app";
 
 // Initialize Firebase with your project's configuration
 const firebaseConfig = {
@@ -27,4 +27,4 @@ export const db = getFirestore(app);
 
 // Create an authentication reference
 const auth = getAuth(app);
-export { auth }
+export { auth };

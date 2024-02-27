@@ -1,12 +1,12 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import { Button, Container,  Typography } from '@mui/material';
+"use client";
+import React, { useState, useEffect } from "react";
+import { Button, Container,  Typography } from "@mui/material";
 
 export default function Home() {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
 
   const handleNav = () => {
-    window.location.href = '/employeeLanding';
+    window.location.href = "/employeeLanding";
   };
 
   return (

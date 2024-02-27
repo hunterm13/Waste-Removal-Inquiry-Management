@@ -1,8 +1,8 @@
-import { useRouter } from 'next/router';
-import { onAuthStateChanged } from 'firebase/auth';
-import { useEffect, useState } from 'react';
-import { auth } from '../utils/firebaseConfig';
-import { CircularProgress, Box } from '@mui/material';
+import { useRouter } from "next/router";
+import { onAuthStateChanged } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { auth } from "../utils/firebaseConfig";
+import { CircularProgress, Box } from "@mui/material";
 
 const ProtectedRoute = ({ children }) => {
   const router = useRouter();
@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children }) => {
   useEffect(() => {
     return onAuthStateChanged(auth, (user) => {
       if (!user) {
-        router.push('/login');
+        router.push("/login");
       } else {
         setLoading(false);
       }
@@ -22,14 +22,14 @@ const ProtectedRoute = ({ children }) => {
   if (loading) {
     return <Box
                 sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '60vh',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "60vh",
                 }}
             >
                 <CircularProgress />
-            </Box>
+            </Box>;
   }
   return children;
 };

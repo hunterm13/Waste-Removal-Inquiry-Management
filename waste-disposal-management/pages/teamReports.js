@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Typography, CircularProgress } from '@mui/material';
-import { auth } from '../utils/firebaseConfig';
-import  ProtectedRoute  from '../components/ProtectedRoute';
-import { getAdminStatus, getAllReports } from '../utils/queries';
-import KpiBar from '../components/KpiSingleBar';
-import KpiPieChart from '../components/KpiPieChart';
-import AllUserKpiTable from '../components/AllUserKpiTable';
+import React, { useEffect, useState } from "react";
+import { Container, Typography, CircularProgress } from "@mui/material";
+import { auth } from "../utils/firebaseConfig";
+import  ProtectedRoute  from "../components/ProtectedRoute";
+import { getAdminStatus, getAllReports } from "../utils/queries";
+import KpiBar from "../components/KpiSingleBar";
+import KpiPieChart from "../components/KpiPieChart";
+import AllUserKpiTable from "../components/AllUserKpiTable";
 
 export default function TeamReports() {
     const [reports, setReports] = useState([]);
@@ -29,7 +29,7 @@ export default function TeamReports() {
     useEffect(() => {
         const unregisterAuthObserver = auth.onAuthStateChanged(async user => {
             if (!auth.currentUser) {
-                window.location.href = '/login';
+                window.location.href = "/login";
             }    
             setIsAuthInitialized(true);
             if (user) {
@@ -52,7 +52,7 @@ export default function TeamReports() {
     }, []);
 
     const calculateSales = (reports) => {
-        console.log(reports)
+        console.log(reports);
         let bookedCount = {
             junkRemoval: 0,
             fencing: 0,
@@ -68,37 +68,37 @@ export default function TeamReports() {
         let lostCount = 0;
 
         reports.forEach(report => {
-            if (report.leadTag === 'Booked') {
-                if (report.service === 'Junk Removal') {
+            if (report.leadTag === "Booked") {
+                if (report.service === "Junk Removal") {
                     bookedCount.junkRemoval++;
-                } else if (report.service === 'Fencing') {
+                } else if (report.service === "Fencing") {
                     bookedCount.fencing++;
-                } else if (report.service === 'Roll Off') {
+                } else if (report.service === "Roll Off") {
                     bookedCount.rollOff++;
-                } else if (report.service === 'Portable Toilet') {
+                } else if (report.service === "Portable Toilet") {
                     bookedCount.portableToilet++;
                 }
-            } else if (report.leadTag === 'Follow Up') {
-                if (report.service === 'Junk Removal') {
+            } else if (report.leadTag === "Follow Up") {
+                if (report.service === "Junk Removal") {
                     followUpCount.junkRemoval++;
-                } else if (report.service === 'Fencing') {
+                } else if (report.service === "Fencing") {
                     followUpCount.fencing++;
-                } else if (report.service === 'Roll Off') {
+                } else if (report.service === "Roll Off") {
                     followUpCount.rollOff++;
-                } else if (report.service === 'Portable Toilet') {
+                } else if (report.service === "Portable Toilet") {
                     followUpCount.portableToilet++;
                 }
             } else {
                 lostCount++;
             }
         });
-        console.log(bookedCount, followUpCount, lostCount)
+        console.log(bookedCount, followUpCount, lostCount);
 
 
         setBooked(bookedCount);
         setFollowUp(followUpCount);
         setOtherReports(lostCount);
-        console.log(`other reports: ${otherReports}`)
+        console.log(`other reports: ${otherReports}`);
     };
 
     if (!isAuthInitialized || loading) {
@@ -113,13 +113,13 @@ export default function TeamReports() {
         return (
             <ProtectedRoute>
                 <Container maxWidth='xl'>
-                    <Container maxWidth="xl" style={{ display: 'flex', justifyContent: 'space-around' }}>
+                    <Container maxWidth="xl" style={{ display: "flex", justifyContent: "space-around" }}>
                         <Typography variant="h2" component="h1" align="left">Bookings</Typography>
                         <Typography variant="h2" component="h1" align="right">Follow Ups</Typography>
                     </Container>
-                    <Container maxWidth="xl" style={{ display: 'flex', justifyContent: 'space-around'}}>
-                        <KpiPieChart values={[[booked.junkRemoval,'Junk Removal'], [booked.fencing,'Fencing'], [booked.rollOff,'Roll Off'],[booked.portableToilet, 'Portable Toilet']]} />
-                        <KpiPieChart values={[[followUp.junkRemoval,'Junk Removal'], [followUp.fencing,'Fencing'], [followUp.rollOff,'Roll Off'],[followUp.portableToilet, 'Portable Toilet']]} totalInquiries={otherReports} />
+                    <Container maxWidth="xl" style={{ display: "flex", justifyContent: "space-around"}}>
+                        <KpiPieChart values={[[booked.junkRemoval,"Junk Removal"], [booked.fencing,"Fencing"], [booked.rollOff,"Roll Off"],[booked.portableToilet, "Portable Toilet"]]} />
+                        <KpiPieChart values={[[followUp.junkRemoval,"Junk Removal"], [followUp.fencing,"Fencing"], [followUp.rollOff,"Roll Off"],[followUp.portableToilet, "Portable Toilet"]]} totalInquiries={otherReports} />
                     </Container>
                     <AllUserKpiTable />
                 </Container>

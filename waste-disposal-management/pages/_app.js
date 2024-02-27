@@ -1,33 +1,33 @@
 // Import required modules
-import React from 'react';
-import { CssBaseline, ThemeProvider } from '@mui/material';
-import { createTheme } from '@mui/material';
-import { Raleway } from 'next/font/google';
-import  NavBar  from '../components/navBar';
+import React from "react";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { createTheme } from "@mui/material";
+import { Raleway } from "next/font/google";
+import  NavBar  from "../components/navBar";
 
 export const raleway = Raleway({
-    weight: '400',
-    subsets: ['latin'],
+    weight: "400",
+    subsets: ["latin"],
   });
 
 const theme = createTheme({
     palette: {
-        mode: 'dark',
+        mode: "dark",
         primary: {
-          main: '#dcd439',
+          main: "#dcd439",
         },
         secondary: {
-          main: '#ff6d00',
+          main: "#ff6d00",
         },
         alert: {
-            main: '#ff0000',
+            main: "#ff0000",
         },
         tertiary: {
-            main: '#006400',
+            main: "#006400",
         },
         background: {
-            default: '#3b3a3a',
-            paper: '#3d3d3d',
+            default: "#3b3a3a",
+            paper: "#3d3d3d",
         },
       },
       typography: {
@@ -42,5 +42,5 @@ export default function MyApp({ Component, pageProps }) {
         <NavBar/>
             <Component {...pageProps} />
         </ThemeProvider>
-    </>
+    </>;
 }

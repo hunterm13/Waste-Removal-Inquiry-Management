@@ -1,8 +1,8 @@
-import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
-import { Alert, FormControl, AlertTitle, CircularProgress, Container, Button, Typography, TextField, FormControlLabel, Switch, InputLabel } from '@mui/material';
-import { getUserDetails, getAdminStatus, deleteUserByID } from '../../utils/queries';
-import { auth } from '../../utils/firebaseConfig';
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
+import { Alert, FormControl, AlertTitle, CircularProgress, Container, Button, Typography, TextField, FormControlLabel, Switch, InputLabel } from "@mui/material";
+import { getUserDetails, getAdminStatus, deleteUserByID } from "../../utils/queries";
+import { auth } from "../../utils/firebaseConfig";
 
 export default function User() {
     const router = useRouter();
@@ -11,14 +11,14 @@ export default function User() {
     const [ user, setUser ] = useState(null);
     const [ isAuthInitialized, setIsAuthInitialized ] = useState(false);
     const [ isAdmin, setIsAdmin ] = useState(false);
-    const [ error, setError ] = useState('');
+    const [ error, setError ] = useState("");
     const [ editing, setEditing ] = useState(false);
     const [ isFormDirty, setIsFormDirty ] = useState(false);
 
     useEffect(() => {
         const unregisterAuthObserver = auth.onAuthStateChanged(async user => {
             if (!auth.currentUser) {
-                window.location.href = '/login';
+                window.location.href = "/login";
             }    
             setIsAuthInitialized(true);
             if (user) {
@@ -37,12 +37,12 @@ export default function User() {
                     setUser(userData);
                     setLoading(false);
                 } catch (error) {
-                    setError('Error fetching user details');
+                    setError("Error fetching user details");
                 }
-            }
-            fetchUser()
+            };
+            fetchUser();
         }
-    }, [isAuthInitialized])
+    }, [isAuthInitialized]);
 
     const handleSave = () => {
         if (editing && isFormDirty) {
@@ -51,25 +51,25 @@ export default function User() {
                 // save changes
                 setEditing(false);
                 setIsFormDirty(false);
-                setError('');
+                setError("");
             }
         } else {
             setEditing(!editing);
         }
-    }
+    };
 
     const handleDelete = async () => {
         const confirmDelete = window.confirm("Are you sure you want to delete the user? This action cannot be undone.");
         if (confirmDelete) {
             try{
                 await deleteUserByID(userID);
-                window.location.href = '/userManagement';
+                window.location.href = "/userManagement";
             } catch (error) {
-                setError('Error deleting user');
+                setError("Error deleting user");
                 console.log(error);
             }
         }
-    }
+    };
 
     const handleEdit = () => {
         if(editing && isFormDirty){
@@ -82,7 +82,7 @@ export default function User() {
         } else {
             setEditing(false);
         }
-    }
+    };
 
     if (!isAuthInitialized || loading) {
         return (
@@ -128,7 +128,7 @@ export default function User() {
             </Typography>
             {editing ? (
                 <form>
-                    <FormControl style={{marginTop: '1rem'}}>
+                    <FormControl style={{marginTop: "1rem"}}>
                         <TextField
                             label="First Name"
                             value={user.firstName}
@@ -136,7 +136,7 @@ export default function User() {
                             required
                         />
                     </FormControl>
-                    <FormControl style={{ marginTop: '1rem' }}>
+                    <FormControl style={{ marginTop: "1rem" }}>
                         <TextField
                             label="First Name"
                             value={user.firstName}
@@ -144,7 +144,7 @@ export default function User() {
                             required
                         />
                     </FormControl>
-                    <FormControl style={{ marginTop: '1rem' }}>
+                    <FormControl style={{ marginTop: "1rem" }}>
                         <TextField
                             label="Last Name"
                             value={user.lastName}
@@ -152,7 +152,7 @@ export default function User() {
                             required
                         />
                     </FormControl>
-                    <FormControl style={{ marginTop: '1rem'}} >
+                    <FormControl style={{ marginTop: "1rem"}} >
                         <TextField
                             label="Email"
                             value={user.email}
@@ -161,40 +161,40 @@ export default function User() {
                         />
                     </FormControl>
                     <FormControlLabel
-                        style={{ marginTop: '1rem' }}
+                        style={{ marginTop: "1rem" }}
                         control={<Switch checked={user.active} onChange={(event) => setUser({ ...user, active: event.target.checked })} />}
                         label="Active"
                     />
                     <FormControlLabel
-                        style={{ marginTop: '1rem' }}
+                        style={{ marginTop: "1rem" }}
                         control={<Switch checked={user.admin} onChange={(event) => setUser({ ...user, admin: event.target.checked })} />}
                         label="Admin"
                     />
                 </form>
             ) : (
-                <Container style={{padding:'0', marginTop:'2rem'}}>
-                    <Typography variant="h5" component="h3" style={{marginTop:'1rem'}}>
+                <Container style={{padding:"0", marginTop:"2rem"}}>
+                    <Typography variant="h5" component="h3" style={{marginTop:"1rem"}}>
                         First Name: {user.firstName}
                     </Typography>
-                    <Typography variant="h5" component="h3" style={{marginTop:'1rem'}}>
+                    <Typography variant="h5" component="h3" style={{marginTop:"1rem"}}>
                         Last Name: {user.lastName}
                     </Typography>
-                    <Typography variant="h5" component="h3" style={{marginTop:'1rem'}}>
+                    <Typography variant="h5" component="h3" style={{marginTop:"1rem"}}>
                         Email: {user.email}
                     </Typography>
-                    <Typography variant="h5" component="h3" style={{marginTop:'1rem'}}>
-                        Active: {user.active ? 'Yes' : 'No'}
+                    <Typography variant="h5" component="h3" style={{marginTop:"1rem"}}>
+                        Active: {user.active ? "Yes" : "No"}
                     </Typography>
-                    <Typography variant="h5" component="h3" style={{marginTop:'1rem'}}>
-                        Admin: {user.admin ? 'Yes' : 'No'}
+                    <Typography variant="h5" component="h3" style={{marginTop:"1rem"}}>
+                        Admin: {user.admin ? "Yes" : "No"}
                     </Typography>
                 </Container>
             )}
-            <Container style={{display:'flex', padding:'0', justifyContent:'space-between', marginTop:'2rem'}}>
+            <Container style={{display:"flex", padding:"0", justifyContent:"space-between", marginTop:"2rem"}}>
                 <Button variant="contained" href="/userManagement">Back to User Management</Button>
-                <Container style={{margin:'0', width:'fit-content', display:'flex', gap:'1rem'}}>
+                <Container style={{margin:"0", width:"fit-content", display:"flex", gap:"1rem"}}>
                     <Button variant="contained" color={!editing ? "primary" : "secondary"} onClick={handleEdit}>
-                        {!editing ? 'Edit' : 'Cancel'}
+                        {!editing ? "Edit" : "Cancel"}
                     </Button>
                     {editing && <Button variant="contained" color="tertiary" onClick={handleSave}>Save</Button>}
                 </Container>

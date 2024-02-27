@@ -1,24 +1,24 @@
-import { useEffect, useState } from "react"
-import { getAllUserID } from "../utils/queries"
-import  KpiRow  from "./KpiRow"
-import { Typography, CircularProgress, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Container } from "@mui/material"
+import { useEffect, useState } from "react";
+import { getAllUserID } from "../utils/queries";
+import  KpiRow  from "./KpiRow";
+import { Typography, CircularProgress, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Container } from "@mui/material";
 
 export default function AllUserKpiTable () {
-    const [loading, setLoading] = useState(true)
-    const [userIDs, setUserIDs] = useState('')
+    const [loading, setLoading] = useState(true);
+    const [userIDs, setUserIDs] = useState("");
 
     useEffect(() => {
         const fetchUserIDs = async () => {
             try {
-                const response = await getAllUserID()
-                setUserIDs(response)
-                setLoading(false)
+                const response = await getAllUserID();
+                setUserIDs(response);
+                setLoading(false);
             } catch (error) {
-                console.error('Error fetching user IDs:', error)
+                console.error("Error fetching user IDs:", error);
             }
-        }
-        fetchUserIDs()
-    }, [])
+        };
+        fetchUserIDs();
+    }, []);
 
     if (loading) {
         return <>
@@ -27,7 +27,7 @@ export default function AllUserKpiTable () {
                     <CircularProgress />
                 </Typography>
             </Container>
-        </>
+        </>;
     }
 
     return<>
@@ -35,16 +35,16 @@ export default function AllUserKpiTable () {
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell style={{width:'15%'}}>Name</TableCell>
-                        <TableCell style={{width:'75%'}}>Conversions</TableCell>
-                        <TableCell style={{width:'10%'}}></TableCell>
+                        <TableCell style={{width:"15%"}}>Name</TableCell>
+                        <TableCell style={{width:"75%"}}>Conversions</TableCell>
+                        <TableCell style={{width:"10%"}}></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {userIDs.map(userID => <KpiRow userID={userID} />)}
+                    {userIDs.map(userID => <KpiRow key={userID} userID={userID} />)}
                 </TableBody>
             </Table>
         </TableContainer>
-    </>
+    </>;
 
 }

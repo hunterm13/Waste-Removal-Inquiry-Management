@@ -1,5 +1,5 @@
-import NewUserForm  from '../components/NewUserForm';
-import { Container, Typography, Button } from '@mui/material';
+import NewUserForm  from "../components/NewUserForm";
+import { Container, Typography, Button } from "@mui/material";
 
 
 export default function signUp() {
@@ -10,5 +10,5 @@ export default function signUp() {
             </Typography>
             <NewUserForm />
         </Container>
-    </>
+    </>;
 }

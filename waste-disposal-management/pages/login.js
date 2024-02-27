@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useState, useEffect, use } from "react";
 import { Typography, Container, CircularProgress } from "@mui/material";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -25,7 +25,7 @@ export default function Login() {
 
     if (loading) {
         return (
-            <Container maxWidth='sm' sx={{ marginTop: 5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Container maxWidth='sm' sx={{ marginTop: 5, display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <CircularProgress sx={{ marginBottom: 2 }} />
             </Container>
         );
@@ -55,11 +55,11 @@ export default function Login() {
     };
 
     return (
-        <Container maxWidth='sm' sx={{ marginTop: 5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Container maxWidth='sm' sx={{ marginTop: 5, display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Typography variant="h3" sx={{ marginBottom: 2 }}>Login</Typography>
             {error && <Typography variant="body1" color="error" sx={{ marginBottom: 2 }}>{error}</Typography>}
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                <FormControl sx={{ marginBottom: 2, width: '60%' }}>
+            <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+                <FormControl sx={{ marginBottom: 2, width: "60%" }}>
                     <InputLabel>Email</InputLabel>
                     <Input
                         type="email"
@@ -67,7 +67,7 @@ export default function Login() {
                         onChange={(e) => setEmail(e.target.value)}
                     />
                 </FormControl>
-                <FormControl sx={{ marginBottom: 2, width: '60%' }}>
+                <FormControl sx={{ marginBottom: 2, width: "60%" }}>
                     <InputLabel>Password</InputLabel>
                     <Input
                         type="password"
