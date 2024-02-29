@@ -31,7 +31,7 @@ export default function AllUserKpiTable () {
     }
 
     return<>
-        <TableContainer component={Paper} style={{marginBottom:'3rem'}}>
+        <TableContainer component={Paper} style={{marginBottom:"3rem"}}>
             <Table>
                 <TableHead sx={{backgroundColor: "#333333"}}>
                     <TableRow>

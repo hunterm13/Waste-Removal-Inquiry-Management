@@ -53,6 +53,6 @@ export default function Home() {
                 </Typography>
                 <AllReportsTable />
             </Container>
-        </>
+        </>;
     }
 }

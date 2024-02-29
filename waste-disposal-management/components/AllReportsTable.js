@@ -86,22 +86,22 @@ const AllReportsTable = () => {
             const aValue = a[sortColumn];
             const bValue = b[sortColumn];
 
-            if (typeof aValue === 'undefined' && typeof bValue === 'undefined') {
+            if (typeof aValue === "undefined" && typeof bValue === "undefined") {
                 return 0;
-            } else if (typeof aValue === 'undefined') {
-                return sortDirection === 'asc' ? 1 : -1;
-            } else if (typeof bValue === 'undefined') {
-                return sortDirection === 'asc' ? -1 : 1;
+            } else if (typeof aValue === "undefined") {
+                return sortDirection === "asc" ? 1 : -1;
+            } else if (typeof bValue === "undefined") {
+                return sortDirection === "asc" ? -1 : 1;
             }
 
-            if (typeof aValue === 'string' && typeof bValue === 'string') {
-                return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+            if (typeof aValue === "string" && typeof bValue === "string") {
+                return sortDirection === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
             }
-            if (typeof aValue === 'number' && typeof bValue === 'number') {
-                return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+            if (typeof aValue === "number" && typeof bValue === "number") {
+                return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
             }
             
-            return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+            return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
         }
         return 0;
     });
@@ -264,9 +264,9 @@ const AllReportsTable = () => {
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.dateReported.toDate().toLocaleDateString()}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>
                                         {!report.service ? "---" : (
-                                            <Tooltip title={report.siteNumber.join(', ')} placement="top">
-                                                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                    {report.siteNumber.join(', ')}
+                                            <Tooltip title={report.siteNumber.join(", ")} placement="top">
+                                                <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                                    {report.siteNumber.join(", ")}
                                                 </div>
                                             </Tooltip>
                                         )}
