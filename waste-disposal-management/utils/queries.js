@@ -80,8 +80,9 @@ export const getAdminStatus = async (userId) => {
 };
 
 export const newReport = async (reportData, newReportType) => {
-    console.log("reportData:", reportData);
-    console.log("reportType:", newReportType);
+    let firstName = await getUserFirstName(reportData.userID);
+    let lastName = await getUserLastName(reportData.userID);
+    reportData.userName = `${firstName} ${lastName}`;
     if(newReportType === "insideSale") {
         try {
             const newReportRef = collection(db, "reports");
@@ -207,7 +208,27 @@ export const deleteReportById = async (reportId) => {
 
 export const updateReportById = async (reportId, reportData) => {
     if (!reportData.reportType){
-
+        try {
+            const reportRef = doc(db, "reports", reportId);
+            const updatedData = {
+              ...reportData,
+              dateUpdated: serverTimestamp()
+            };
+            if (reportData.howHeard === "Other" && !reportData.otherHowHear) {
+                throw new Error("How they heard about us is missing");
+            } else if (reportData.service === "Roll Off" && !reportData.binSize) {
+                throw new Error("Bin size is missing");
+            } else if (!reportData.service || !reportData.workFlow || !reportData.city || !reportData.region || !reportData.siteName || !reportData.siteAddress || !reportData.contactEmail || !reportData.leadChannel || !reportData.leadTag || !reportData.siteNumber || !reportData.howHear) {
+                throw new Error("Required fields are missing");
+            } else if (reportData.siteNumber.length > 1) {
+                reportData.siteNumber = reportData.siteNumber
+                    .split(",")
+                    .map((number) => number.trim());
+            }
+            await setDoc(reportRef, updatedData, { merge: true });
+        } catch (error) {
+            throw error;
+        }
     } else if (reportData.reportType === "Front Load") {
         try {
             const reportRef = doc(db, "reports", reportId);
@@ -399,4 +420,25 @@ export const getAllReports = async () => {
         console.error("Error retrieving reports:", error);
         throw error;
     }
+};
+
+//use this only if there are issues with usernames not being added to reports
+export const updateReportsWithUserName = async () => {
+  try {
+    const reports = await getAllReports();
+
+    for (const report of reports) {
+      if (!report.userName) {
+        const firstName = await getUserFirstName(report.userID);
+        const lastName = await getUserLastName(report.userID);
+        const userName = `${firstName} ${lastName}`;
+
+        const reportRef = doc(db, "reports", report.id);
+        await setDoc(reportRef, { userName }, { merge: true });
+      }
+    }
+  } catch (error) {
+    console.error("Error updating reports with userName:", error);
+    throw error;
+  }
 };

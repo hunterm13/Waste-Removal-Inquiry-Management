@@ -64,7 +64,7 @@ const Navbar = () => {
                                 "&:hover": {
                                     color: "primary.main",
                                 },
-                            }}>Company Name</Button>
+                            }}>310 Dump</Button>
                 </Container>
                 <Container sx={{ display: "flex", justifyContent: "flex-end" }}>
                     {user ? (
@@ -107,7 +107,15 @@ const Navbar = () => {
                                 "&:hover": {
                                     color: "primary.main",
                                 },
-                            }}>Team Reports</Button>
+                            }}>KPI Summary</Button>
+                        </ListItem>
+                        <ListItem sx={{padding:"0 16px 0 0"}}>
+                            <Button variant="text" component={Link} href="/allReports" sx={{
+                                color: "white",
+                                "&:hover": {
+                                    color: "primary.main",
+                                },
+                            }}>All Reports</Button>
                         </ListItem>
                         <ListItem sx={{padding:"0 16px 0 0"}}>
                             <Button variant="text" component={Link} href="/userManagement" sx={{

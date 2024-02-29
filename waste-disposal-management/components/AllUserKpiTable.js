@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getAllUserID } from "../utils/queries";
 import  KpiRow  from "./KpiRow";
-import { Typography, CircularProgress, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Container } from "@mui/material";
+import { Paper, Typography, CircularProgress, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Container } from "@mui/material";
 
 export default function AllUserKpiTable () {
     const [loading, setLoading] = useState(true);
@@ -31,9 +31,9 @@ export default function AllUserKpiTable () {
     }
 
     return<>
-        <TableContainer>
+        <TableContainer component={Paper} style={{marginBottom:'3rem'}}>
             <Table>
-                <TableHead>
+                <TableHead sx={{backgroundColor: "#333333"}}>
                     <TableRow>
                         <TableCell style={{width:"15%"}}>Name</TableCell>
                         <TableCell style={{width:"75%"}}>Conversions</TableCell>

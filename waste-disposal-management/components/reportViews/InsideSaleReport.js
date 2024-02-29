@@ -1,28 +1,36 @@
 import { Container, Typography, Button, Select, TextField, MenuItem, FormControl, InputLabel, RadioGroup, FormLabel, FormControlLabel, Radio, Alert, AlertTitle } from "@mui/material";
 import { useEffect, useState } from "react";
-import { deleteReportById, updateReportById, getUserFirstName } from "../../utils/queries";
+import { deleteReportById, updateReportById, updateReportsWithUserName } from "../../utils/queries";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-
+import { Router, useRouter } from "next/router";
+import dayjs from "dayjs";
 
 export default function FrontLoadReport({report, reportID}) {
     const [reportData, setReportData] = useState(report);
+    const [initialReportData, setInitialReportData] = useState(report);
     const [editing, setEditing] = useState(false);
-    const [isFormDirty, setIsFormDirty] = useState(false);
+    const [isFormDirty, setFormDirty] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formattedDateUpdated, setFormattedDateUpdated] = useState();
     const [error, setError] = useState("");
-    const [reportingUser, setReportingUser] = useState();
+    const router = useRouter();
+
 
     useEffect(() => {
-        const fetchUser = async () => {
-            try{
-                const user = await getUserFirstName(reportData.userID);
-                setReportingUser(user);
-            } catch (error) {
-                console.error("Error fetching user details: ", error);
+        const handleBeforeUnload = (event) => {
+            if (isFormDirty && !isSubmitting) {
+            event.preventDefault();
+            event.returnValue = "";
             }
         };
-        fetchUser();
-    }, []);
+    
+        window.addEventListener("beforeunload", handleBeforeUnload);
+    
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [isFormDirty, isSubmitting]);
 
     const formatDateLocale = (date) => {
         const dateMilliseconds = date.seconds * 1000 + date.nanoseconds / 1000000;
@@ -30,7 +38,15 @@ export default function FrontLoadReport({report, reportID}) {
         return formattedDate.toLocaleString();
     };
     const formattedDateReported = formatDateLocale(reportData.dateReported);
-    const formattedDateUpdated = reportData.dateUpdated ? formatDateLocale(reportData.dateUpdated) : null;    
+
+    const updateTime = () => {
+        if (reportData.dateUpdated) {
+            setFormattedDateUpdated(formatDateLocale(reportData.dateUpdated));
+        }
+    };
+    useEffect(() => {         
+        updateTime();
+    }, [reportData]);
 
     const handleDelete = async () => {
         const confirmDelete = window.confirm("Are you sure you want to delete the report? This action cannot be undone.");
@@ -44,33 +60,92 @@ export default function FrontLoadReport({report, reportID}) {
         }
     };
 
-    const handleChange = (dataType, event) => {
-        setReportData({...reportData, [dataType]: event.target.value});
-        setIsFormDirty(true);
-    };
-
-    const handleEdit = () => {
-        if (editing && isFormDirty) {
-            console.log(reportData);
-            const confirmSave = window.confirm("Are you sure you want to save changes?");
-            if (confirmSave) {
-                updateReportById(reportID, reportData);
-                setEditing(false);
+    const handleInputChange = (event, field) => {
+        setReportData(prevReport => {
+            if(field === "deliveryDate" || field === "removalDate"){
+                return { ...prevReport, [field]: convertToDate(event) };
+            } else {
+                return { ...prevReport, [field]: event.target.value };
             }
-        } else {
-            setEditing(true);
-        }
+        });
+        setFormDirty(true);
     };
+    
+    useEffect(() => {
+        if (reportData.service === "Roll Off") {
+            setReportData({ ...reportData, workFlow: "DELIVERRO" });
+        } else if (reportData.service === "Junk Removal") {
+            setReportData({ ...reportData, workFlow: "SERVICEJR" });
+        } else if (reportData.service === "Portable Toilet") {
+            setReportData({ ...reportData, workFlow: "DELPT" });
+        } else if (reportData.service === "Fencing") {
+            setReportData({ ...reportData, workFlow: "DELFE" });
+        }
+    }, [reportData.service]);
 
     const handleCancel = () => {
         if(isFormDirty){
             const confirmCancel = window.confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
             if (confirmCancel) {
+                setReportData(initialReportData);
                 setEditing(false);
+                setFormDirty(false);
+                setError("");
             }
-        }else{
+        } else {
             setEditing(false);
+            setReportData(initialReportData);
+            setError("");
         }
+    };
+
+    const handleEdit = async () => {
+        try {
+            if (editing && isFormDirty) {
+                const confirmSave = window.confirm("Are you sure you want to save changes?");
+                if (confirmSave) {
+                    if(reportData.deliveryDate){
+                        reportData.deliveryDate = convertToDate(reportData.deliveryDate);
+                    }
+                    if(reportData.removalDate) {
+                        reportData.removalDate = convertToDate(reportData.removalDate);
+                        if (reportData.deliveryDate > reportData.removalDate) {
+                            setError("Removal date cannot be before delivery date");
+                            return;
+                        }
+                    }
+                    if(reportData.siteNumber.length > 1) {
+                        const phoneNumberArray = reportData.siteNumber.split(",").map(number => number.trim());
+                        const containsOnlyNumbers = phoneNumberArray.every(number => /^\d+$/.test(number));
+                        if (!containsOnlyNumbers) {
+                            setError("Phone number format is incorrect, please use numbers only and separate with commas");
+                            return;
+                        }
+                    }
+                    await updateReportById(reportID, reportData);
+                    setEditing(false);
+                    setFormDirty(false);
+                    setInitialReportData(reportData);
+                    setError("");
+                }
+            } else if (editing && !isFormDirty){
+                setEditing(false);
+            } else {
+                setEditing(true);
+            }
+        } catch (error) {
+            console.log(error);
+            setError(`${error.message}`);
+        }
+    };
+
+    const convertToDate = (date) => {
+        let newDate = new Date(date);
+        let day = newDate.getDate(); // Day of the month, from 1-31
+        let month = newDate.getMonth() + 1; // Months are zero-based, so we add 1
+        let year = newDate.getFullYear();
+        let formattedDate = `${month}/${day}/${year}`;
+        return formattedDate;
     };
 
     return <>
@@ -79,8 +154,212 @@ export default function FrontLoadReport({report, reportID}) {
                 <Typography variant="h2" style={{marginBottom:"2rem"}} component="h1">{report.service} Report Details</Typography>
                 <Button variant="contained" style={{height:"fit-content"}} onClick={handleDelete} color="alert">Delete Report</Button>
             </Container>
-            {editing ? <form> 
-
+            {error && 
+                <Alert severity='error' sx={{ marginBottom: 2 }}>
+                    <AlertTitle>{error}</AlertTitle>
+                </Alert>}
+            {editing && reportData? <form>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", padding: "0" }}>
+                    <FormControl sx={{width:"20%"}}>
+                        <InputLabel id="service">Service *</InputLabel>
+                        <Select 
+                            required 
+                            onChange={(event) => handleInputChange(event, "service")}
+                            label={"Service"}
+                            labelId="service"
+                            value={reportData.service}
+                        >
+                            <MenuItem value="Roll Off">Roll Off</MenuItem>
+                            <MenuItem value="Junk Removal">Junk Removal</MenuItem>
+                            <MenuItem value="Portable Toilet">Portable Toilet</MenuItem>
+                            <MenuItem value="Fencing">Fencing</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <FormControl  sx={{width:"20%"}}>
+                        <InputLabel id="workFlow">{reportData.workFlow || "Work Flow"}</InputLabel>
+                        <Select
+                            label={"Work Flow"}
+                            labelId="workFlow"
+                            value={reportData.workFlow}
+                            disabled
+                        >
+                            <MenuItem value="DELIVERRO">DELIVERRO</MenuItem>
+                            <MenuItem value="SERVICEJR">SERVICE-JR</MenuItem>
+                            <MenuItem value="DELPT">DELPT</MenuItem>
+                            <MenuItem value="DELFE">DELFE</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {reportData.service === "Roll Off" ? <FormControl style={{display:"flex", flexWrap:"nowrap", flexDirection:"row", alignItems:"center", gap:"1rem"}} sx={{width:"50%"}}>
+                        <FormLabel id="binSize">Bin Size (Yards) * :</FormLabel>
+                        <RadioGroup
+                            label={"Bin Size (Yards)"}
+                            labelId="binSize"
+                            value={reportData.binSize}
+                            required
+                            style={{ display: "flex", flexDirection: "row" }}
+                            onChange={(event) => handleInputChange(event, "binSize")}
+                        >
+                            <FormControlLabel value="10" control={<Radio/>} label="10" />
+                            <FormControlLabel value="15" control={<Radio/>} label="15" />
+                            <FormControlLabel value="30" control={<Radio/>} label="30" />
+                            <FormControlLabel value="40" control={<Radio/>} label="40" />
+                        </RadioGroup>
+                    </FormControl>: null}
+                </Container>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding: "0" }}>
+                    
+                    <FormControl  sx={{width:"25%"}}>
+                        <InputLabel id="region">Region *</InputLabel>
+                        <Select 
+                            required id="region"
+                            value={reportData.region}
+                            onChange={(event) => handleInputChange(event, "region")}
+                            label={"Region"}
+                            labelId="region"                            
+                        >
+                            <MenuItem value="Edmonton">Edmonton</MenuItem>
+                            <MenuItem value="Calgary">Calgary</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <FormControl  sx={{width:"40%"}}>
+                        <TextField
+                            required
+                            label="Address"
+                            value={reportData.siteAddress}
+                            onChange={(event) => handleInputChange(event, "siteAddress")}
+                        />
+                    </FormControl>
+                    <FormControl  sx={{width:"25%"}}>
+                        <TextField
+                            required
+                            label="City"
+                            value={reportData.city}
+                            onChange={(event) => handleInputChange(event, "city")}
+                        />
+                    </FormControl>                    
+                </Container>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding:"0" }}>
+                    <FormControl  sx={{width:"30%"}}>
+                        <TextField
+                            required
+                            helperText="Numbers only, use comma to separate."
+                            label="Contact Number"
+                            value={reportData.siteNumber}
+                            onChange={(event) => handleInputChange(event, "siteNumber")}
+                        />
+                    </FormControl>
+                    <FormControl  sx={{width:"30%"}}>
+                        <TextField
+                            label="Contact Name"
+                            value={reportData.contactName}
+                            onChange={(event) => handleInputChange(event, "contactName")}
+                        />
+                    </FormControl>
+                    <FormControl  sx={{width:"30%"}}>
+                        <TextField
+                            required
+                            label="Contact Email"
+                            value={reportData.contactEmail}
+                            onChange={(event) => handleInputChange(event, "contactEmail")}
+                        />
+                    </FormControl>
+                </Container>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding:"0"}}>
+                    <FormControl  sx={{width:"30%"}}>
+                        <TextField
+                            required
+                            label="Business Name"
+                            value={reportData.siteName}
+                            onChange={(event) => handleInputChange(event, "siteName")}
+                        />
+                    </FormControl>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="Delivery Date"
+                            format="MM/DD/YYYY"
+                            onChange={(date) => handleInputChange(date, "deliveryDate")}
+                            value={reportData.deliveryDate ? dayjs(reportData.deliveryDate) : null}
+                        />                        
+                    </LocalizationProvider>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="Removal Date"
+                            format="MM/DD/YYYY"
+                            value={reportData.removalDate ? dayjs(reportData.removalDate) : null}
+                            onChange={(date) => handleInputChange(date, "removalDate")}
+                        />
+                    </LocalizationProvider>
+                </Container>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding:"0" }}>
+                    <FormControl component="fieldset" sx={{ width: "30%" }}>
+                        <FormLabel component="legend">Lead Channel</FormLabel>
+                        <RadioGroup
+                            aria-label="Lead Channel"
+                            name="leadChannel"
+                            value={reportData.leadChannel}
+                            onChange={(event) => handleInputChange(event, "leadChannel")}
+                            style={{ display: "flex", flexDirection: "row" }}
+                        >
+                            <FormControlLabel value="Phone" control={<Radio required={true}/>} label="Phone" />
+                            <FormControlLabel value="Email" control={<Radio required={true}/>} label="Email" />
+                            <FormControlLabel value="Podium" control={<Radio required={true}/>} label="Podium" />
+                        </RadioGroup>
+                    </FormControl>
+                    <FormControl sx={{ width: "30%" }}>
+                        <FormLabel component="legend">Lead Tag</FormLabel>
+                        <RadioGroup
+                            aria-label="Lead Tags"
+                            name="leadTags"
+                            value={reportData.leadTag}
+                            onChange={(event) => handleInputChange(event, "leadTag")}
+                            style={{ display: "flex", flexDirection: "row" }}
+                        >
+                            <FormControlLabel value="Follow Up" control={<Radio required={true}/>} label="Follow Up" />
+                            <FormControlLabel value="Booked" control={<Radio required={true}/>} label="Booked" />
+                            <FormControlLabel value="Lost" control={<Radio required={true}/>} label="Lost" />
+                        </RadioGroup>
+                    </FormControl>
+                </Container>
+                <Container maxWidth="lg" style={{padding:"0", marginTop:"1rem"}}>
+                    <FormControl sx={{ width: "100%" }}>
+                        <TextField
+                            required
+                            multiline
+                            label="Notes"
+                            value={reportData.notes}
+                            onChange={(event) => handleInputChange(event, "notes")}
+                        />
+                    </FormControl>
+                </Container>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding: "0" }}>
+                    <FormControl sx={{ width: "25%" }}>
+                        <InputLabel id="how-hear-label">How did they hear about us?</InputLabel>
+                        <Select
+                            labelId="how-hear-label"
+                            id="how-hear-select"
+                            label="How did they hear about us?"
+                            required
+                            value={reportData.howHear}
+                            onChange={(event) => handleInputChange(event, "howHear")}
+                        >
+                            <MenuItem value="kijiji">Kijiji</MenuItem>
+                            <MenuItem value="facebook">Facebook</MenuItem>
+                            <MenuItem value="word-of-mouth">Word of Mouth</MenuItem>
+                            <MenuItem value="google">Google</MenuItem>
+                            <MenuItem value="other">Other</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {reportData.howHear === "other" && (
+                    <FormControl sx={{ width: "40%" }}>
+                        <TextField
+                        required
+                        label="Other"
+                        value={reportData.otherHowHear}
+                        onChange={(event) => handleInputChange(event, "otherHowHear")}
+                        />
+                    </FormControl>
+                    )} 
+                </Container>
             </form> : 
             <Container style={{display:"flex", flexDirection:"column", gap:"1rem"}}>
                 <Typography variant="body1" component="h2">Service: {reportData.service}</Typography>
@@ -90,6 +369,7 @@ export default function FrontLoadReport({report, reportID}) {
                 <Typography variant="body1" component="h2">Contact Phone: {reportData.siteNumber}</Typography>
                 <Typography variant="body1" component="h2">Contact Name: {reportData.contactName}</Typography>
                 <Typography variant="body1" component="h2">Contact Email: {reportData.contactEmail}</Typography>
+                <Typography variant="body1" component="h2">Business Name: {reportData.siteName}</Typography>
                 {reportData.howHear !== "Other" ? <Typography variant="body1" component="h2">How did they hear about us? {reportData.howHear}</Typography> : <Typography variant="body1" component="h2">How did you hear about us? {reportData.otherHear}</Typography>}
                 <Typography variant="body1" component="h2">Lead Channel: {reportData.leadChannel}</Typography>
                 <Typography variant="body1" component="h2">Lead Tag: {reportData.leadTag}</Typography>
@@ -101,14 +381,14 @@ export default function FrontLoadReport({report, reportID}) {
             <Container style={{display:"flex", padding:"0", justifyContent:"space-between", marginTop:"1rem"}}>
                 <Button variant="contained" href="/employeeLanding">Back to Reports</Button>
                 <Container style={{margin:"0", width:"fit-content", display:"flex", gap:"1rem"}}>
-                    {editing && <Button variant="contained" color="alert" onClick={handleCancel}>Cancel</Button>}
-                    <Button variant="contained" disabled onClick={handleEdit}>{editing ? "Save" : "Edit (coming soon)"}</Button>                    
+                    {editing && <Button variant="contained" color="secondary" onClick={handleCancel}>Cancel</Button>}
+                    <Button variant="contained" onClick={handleEdit}>{editing ? "Save" : "Edit"}</Button>                    
                 </Container>
             </Container>
             <Typography variant="body1" style={{marginTop:"1rem"}} component="h2">Date Reported: {formattedDateReported}</Typography>
-            {report.dateUpdated ? <Typography variant="body1" component="h2">Date Last Updated: {formattedDateUpdated}</Typography> : null}
+            {reportData.dateUpdated ? <Typography variant="body1" component="h2">Date Last Updated: {formattedDateUpdated}</Typography> : null}
             <Typography variant="body1" component="h2">Report ID: {reportID}</Typography>
-            <Typography variant="body1" component="h2">Reported By: {reportingUser}</Typography>
+            <Typography variant="body1" component="h2">Reported By: {reportData.userName}</Typography>
         </Container>
     </>;
 }

@@ -1,9 +1,9 @@
 import React, { use, useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Button, TablePagination, Container, MenuItem, TextField, Select, Menu, Checkbox, Typography, FormControlLabel} from "@mui/material";
-import { getReportsByUserId } from "../utils/queries";
+import { Table, TableBody, Tooltip, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Button, TablePagination, Container, MenuItem, TextField, Select, Menu, Checkbox, Typography, FormControlLabel} from "@mui/material";
+import { getAllReports } from "../utils/queries";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 
-const UserReportsTable = ({ uid }) => {
+const AllReportsTable = () => {
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sortColumn, setSortColumn] = useState("dateReported");
@@ -17,8 +17,9 @@ const UserReportsTable = ({ uid }) => {
     useEffect(() => {
         const fetchUserReports = async () => {
             try {
+                
                 setLoading(true);
-                const userReports = await getReportsByUserId(uid);
+                const userReports = await getAllReports();
                 setReports(userReports);
                 setLoading(false);
             } catch (error) {
@@ -64,8 +65,8 @@ const UserReportsTable = ({ uid }) => {
         switch (searchType) {
             case "Inquiry Type":
                 return report.service && report.service.toLowerCase().includes(searchTerm.toLowerCase());
-            case "City":
-                return report.city && report.city.toLowerCase().includes(searchTerm.toLowerCase());
+            case "Site Number":
+                return report.siteNumber && report.siteNumber.toString().includes(searchTerm);
             case "Contact Name":
                 return report.contactName && report.contactName.toLowerCase().includes(searchTerm.toLowerCase());
             case "Site Name":
@@ -84,12 +85,23 @@ const UserReportsTable = ({ uid }) => {
         if (sortColumn) {
             const aValue = a[sortColumn];
             const bValue = b[sortColumn];
-            if (aValue < bValue) {
-                return sortDirection === "asc" ? -1 : 1;
+
+            if (typeof aValue === 'undefined' && typeof bValue === 'undefined') {
+                return 0;
+            } else if (typeof aValue === 'undefined') {
+                return sortDirection === 'asc' ? 1 : -1;
+            } else if (typeof bValue === 'undefined') {
+                return sortDirection === 'asc' ? -1 : 1;
             }
-            if (aValue > bValue) {
-                return sortDirection === "asc" ? 1 : -1;
+
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
             }
+            if (typeof aValue === 'number' && typeof bValue === 'number') {
+                return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+            }
+            
+            return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
         }
         return 0;
     });
@@ -109,22 +121,37 @@ const UserReportsTable = ({ uid }) => {
                 }}
                 value={searchType}>
                     <MenuItem value="Inquiry Type">Inquiry Type</MenuItem>
-                    <MenuItem value="City">City</MenuItem>
+                    <MenuItem value="Site Number">Contact Number</MenuItem>
                     <MenuItem value="Contact Name">Contact Name</MenuItem>
                     <MenuItem value="Site Name">Site Name</MenuItem>
                 </Select>
             </Container>
             <Container maxWidth="xl" style={{padding:"0", marginBottom:"1rem", display:"flex", justifyContent: "end", alignItems: "center"}}>
-                <FormControlLabel control={<Checkbox checked={showOther} onChange={(event) => setShowOther(event.target.checked)} />} label='Show All Reports'/>
+                <FormControlLabel control={<Checkbox checked={showOther} onChange={(event) => setShowOther(event.target.checked)} />} label='Include Other Reports'/>
             </Container>
         </Container>
         <TableContainer component={Paper}>
             <Table>
                 <TableHead sx={{backgroundColor: "#333333"}}>
                     <TableRow>
+                        <TableCell
+                            onClick={() => handleSort("userName")}
+                            style={{
+                                fontWeight: "bold", 
+                                fontSize: "1.5rem",
+                                cursor: "pointer",
+                                verticalAlign: "middle",
+                                whiteSpace: "nowrap",
+                            }}>
+                            User
+                            {sortColumn === "userName" && (
+                                sortDirection === "asc" ? <KeyboardArrowUp style={{ verticalAlign: "middle", margin: 0, padding: 0 }} /> : <KeyboardArrowDown style={{ verticalAlign: "middle", margin: 0, padding: 0 }} />
+                            )}
+                        </TableCell>
                         <TableCell 
                             onClick={() => handleSort("service")}
-                            style={{ 
+                            style={{
+                                borderLeft: "1px solid rgba(81,81,81,1)",
                                 fontWeight: "bold", 
                                 fontSize: "1.5rem",
                                 cursor: "pointer",
@@ -157,19 +184,16 @@ const UserReportsTable = ({ uid }) => {
                             )}
                         </TableCell>
                         <TableCell
-                            onClick={() => handleSort("city")}
                             style={{ 
                                 borderLeft: "1px solid rgba(81,81,81,1)",
                                 fontWeight: "bold", 
                                 fontSize: "1.5rem",
-                                cursor: "pointer",
                                 verticalAlign: "middle",
                                 whiteSpace: "nowrap",
                             }}>
-                            City
-                            {sortColumn === "city" && (
-                                sortDirection === "asc" ? <KeyboardArrowUp style={{ verticalAlign: "middle", margin: 0, padding: 0 }} /> : <KeyboardArrowDown style={{ verticalAlign: "middle", margin: 0, padding: 0 }} />
-                            )}
+                            <Tooltip title="Not Sortable" placement="top">
+                                Contact Number
+                            </Tooltip>
                         </TableCell>
                         <TableCell
                             onClick={() => handleSort("contactName")}
@@ -183,21 +207,6 @@ const UserReportsTable = ({ uid }) => {
                             }}>
                             Contact Name
                             {sortColumn === "contactName" && (
-                                sortDirection === "asc" ? <KeyboardArrowUp style={{ verticalAlign: "middle", margin: 0, padding: 0 }} /> : <KeyboardArrowDown style={{ verticalAlign: "middle", margin: 0, padding: 0 }} />
-                            )}
-                        </TableCell>
-                        <TableCell
-                            onClick={() => handleSort("deliveryDate")}
-                            style={{ 
-                                borderLeft: "1px solid rgba(81,81,81,1)",
-                                fontWeight: "bold", 
-                                fontSize: "1.5rem",
-                                cursor: "pointer",
-                                verticalAlign: "middle",
-                                whiteSpace: "nowrap",
-                            }}>
-                            Delivery Date
-                            {sortColumn === "deliveryDate" && (
                                 sortDirection === "asc" ? <KeyboardArrowUp style={{ verticalAlign: "middle", margin: 0, padding: 0 }} /> : <KeyboardArrowDown style={{ verticalAlign: "middle", margin: 0, padding: 0 }} />
                             )}
                         </TableCell>
@@ -231,6 +240,7 @@ const UserReportsTable = ({ uid }) => {
                                 sortDirection === "asc" ? <KeyboardArrowUp style={{ verticalAlign: "middle", margin: 0, padding: 0 }} /> : <KeyboardArrowDown style={{ verticalAlign: "middle", margin: 0, padding: 0 }} />
                             )}
                         </TableCell>
+                        
                         <TableCell 
                             style={{ 
                                 borderLeft: "1px solid rgba(81,81,81,1)",
@@ -240,24 +250,31 @@ const UserReportsTable = ({ uid }) => {
                                 verticalAlign: "middle",
                                 whiteSpace: "nowrap",
                             }}>
-                        </TableCell>
-                        
+                        </TableCell>                        
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {sortedReports
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         .map((report) => {
-                            console.log(report); // Log the report
                             return (
                                 <TableRow key={report.id}>
-                                    <TableCell>{report.service || report.reportType}</TableCell>
+                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.userName}</TableCell>
+                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.service || report.reportType}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.dateReported.toDate().toLocaleDateString()}</TableCell>
-                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service ? "---" : report.city}</TableCell>
+                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>
+                                        {!report.service ? "---" : (
+                                            <Tooltip title={report.siteNumber.join(', ')} placement="top">
+                                                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    {report.siteNumber.join(', ')}
+                                                </div>
+                                            </Tooltip>
+                                        )}
+                                    </TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service ? "---" : report.contactName}</TableCell>
-                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service || !report.deliveryDate ? "---": report.deliveryDate}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service ? "---" : report.siteName}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service ? "---" : report.contactEmail}</TableCell>
+                                    
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>
                                         <Button variant='contained' onClick={() => redirectToReport(report.id)}>View</Button>
                                     </TableCell>
@@ -279,4 +296,4 @@ const UserReportsTable = ({ uid }) => {
     </>;
 };
 
-export default UserReportsTable;
+export default AllReportsTable;

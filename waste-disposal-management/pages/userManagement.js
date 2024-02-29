@@ -93,12 +93,13 @@ export default function AdminPage() {
                     </Container>
                     <TableContainer component={Paper}>
                         <Table>
-                            <TableHead>
+                            <TableHead sx={{backgroundColor: "#333333"}}>
                                 <TableRow>
                                     <TableCell>First Name</TableCell>
                                     <TableCell>Last Name</TableCell>
                                     <TableCell style={{width:"10%"}}>Active</TableCell>
                                     <TableCell style={{width:"10%"}}>Admin</TableCell>
+                                    <TableCell style={{width:"10%"}}></TableCell>
                                     <TableCell style={{width:"10%"}}></TableCell>
                                 </TableRow>
                             </TableHead>

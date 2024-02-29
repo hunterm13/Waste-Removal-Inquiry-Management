@@ -256,7 +256,7 @@ export default function NewReport({ userID, reportType }) {
                     <FormControl  sx={{width:"30%"}}>
                         <TextField
                             required
-                            label="Site Name"
+                            label="Business Name"
                             value={report.siteName}
                             onChange={(event) => handleInputChange(event, "siteName")}
                         />

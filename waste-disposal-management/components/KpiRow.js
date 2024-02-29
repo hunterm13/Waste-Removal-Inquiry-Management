@@ -58,7 +58,7 @@ export default function KpiRow({userID}) {
                     {conversions && inquiries ? (
                         <KpiSingleBar salesMade={conversions} totalInquiries={inquiries} />
                     ) : (
-                        <Typography>Not yet</Typography>
+                        <Typography>Nothing To Show</Typography>
                     )}
                 </TableCell>
                 <TableCell>
