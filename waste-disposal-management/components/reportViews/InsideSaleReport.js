@@ -99,17 +99,22 @@ export default function FrontLoadReport({report, reportID}) {
         }
     };
 
+    function convertToDateObject(dateString) {
+        const [month, day, year] = dateString.split("/").map(Number);
+        return new Date(year, month - 1, day); // Note: Months are zero-indexed (January is 0)
+    }
+
     const handleEdit = async () => {
         try {
             if (editing && isFormDirty) {
                 const confirmSave = window.confirm("Are you sure you want to save changes?");
                 if (confirmSave) {
                     if(reportData.deliveryDate){
-                        reportData.deliveryDate = convertToDate(reportData.deliveryDate);
+                        setReportData({ ...reportData, deliveryDate: convertToDate(reportData.deliveryDate) });
                     }
                     if(reportData.removalDate) {
-                        reportData.removalDate = convertToDate(reportData.removalDate);
-                        if (reportData.deliveryDate > reportData.removalDate) {
+                        setReportData({ ...reportData, removalDate: convertToDate(reportData.removalDate) });
+                        if (convertToDateObject(reportData.deliveryDate) > convertToDateObject(reportData.removalDate)) {
                             setError("Removal date cannot be before delivery date");
                             return;
                         }

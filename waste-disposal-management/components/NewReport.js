@@ -86,6 +86,10 @@ export default function NewReport({ userID, reportType }) {
         }
     }, [report.service]);
 
+    function convertToDateObject(dateString) {
+        const [month, day, year] = dateString.split("/").map(Number);
+        return new Date(year, month - 1, day); // Note: Months are zero-indexed (January is 0)
+    }
 
     const handleSubmitInside = (event) => {
         event.preventDefault();
@@ -95,7 +99,7 @@ export default function NewReport({ userID, reportType }) {
         }
         if(report.removalDate) {
             report.removalDate = convertToDate(report.removalDate);
-            if (report.deliveryDate > report.removalDate) {
+            if (convertToDateObject(report.deliveryDate) > convertToDateObject(report.removalDate)) {
                 setError("Removal date cannot be before delivery date");
                 return;
             }
