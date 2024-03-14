@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import { PieChart, Pie, Cell, Legend } from "recharts";
 
 const KpiPieChart = ({ values, totalInquiries }) => {
@@ -24,9 +24,8 @@ const KpiPieChart = ({ values, totalInquiries }) => {
     const pieChartData = updatedValues.map(([value, label]) => ({ value, label }));
 
     return (
-        <PieChart width={800} height={400} style={{margin:"0 auto"}}>
+        <PieChart width={400} height={500} style={{margin:"0 auto"}}>
             <Pie
-            
                 data={pieChartData}
                 dataKey="value"
                 nameKey="label"
@@ -40,7 +39,7 @@ const KpiPieChart = ({ values, totalInquiries }) => {
                     <Cell key={`cell-${index}`} fill={colorMapping[entry.label] || "gray"} />
                 ))}
             </Pie>
-            <Legend iconSize={10} width={250} height={140} layout="vertical" verticalAlign="middle" align="right" />
+            <Legend iconSize={10} width={400} height={140} layout="horizontal" verticalAlign="bottom" align="center" />
         </PieChart>
     );
 };

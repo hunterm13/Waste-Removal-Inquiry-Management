@@ -7,7 +7,7 @@ import { styled } from "@mui/system";
 import { useRouter } from "next/router";
 
 const CustomAppBar = styled(AppBar)({
-    maxWidth: "1200px",
+    maxWidth: "90vw",
     borderRadius: "10px",
     margin: "16px auto 32px auto",
 
@@ -100,6 +100,14 @@ const Navbar = () => {
                                     color: "primary.main",
                                 },
                             }}>Dashboard</Button>
+                        </ListItem>
+                        <ListItem sx={{padding:"0 16px 0 0"}}>
+                            <Button variant="text" component={Link} href="/dailyTracker" sx={{
+                                color: "white",
+                                "&:hover": {
+                                    color: "primary.main",
+                                },
+                            }}>Daily Tracker</Button>
                         </ListItem>
                         <ListItem sx={{padding:"0 16px 0 0"}}>
                             <Button variant="text" component={Link} href="/teamReports" sx={{

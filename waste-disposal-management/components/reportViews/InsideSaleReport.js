@@ -119,14 +119,6 @@ export default function FrontLoadReport({report, reportID}) {
                             return;
                         }
                     }
-                    if(reportData.siteNumber.length > 1) {
-                        const phoneNumberArray = reportData.siteNumber.split(",").map(number => number.trim());
-                        const containsOnlyNumbers = phoneNumberArray.every(number => /^\d+$/.test(number));
-                        if (!containsOnlyNumbers) {
-                            setError("Phone number format is incorrect, please use numbers only and separate with commas");
-                            return;
-                        }
-                    }
                     await updateReportById(reportID, reportData);
                     setEditing(false);
                     setFormDirty(false);
@@ -247,7 +239,7 @@ export default function FrontLoadReport({report, reportID}) {
                     <FormControl  sx={{width:"30%"}}>
                         <TextField
                             required
-                            helperText="Numbers only, use comma to separate."
+                            helperText="If not available, enter 'NA'"
                             label="Contact Number"
                             value={reportData.siteNumber}
                             onChange={(event) => handleInputChange(event, "siteNumber")}
@@ -306,7 +298,7 @@ export default function FrontLoadReport({report, reportID}) {
                             style={{ display: "flex", flexDirection: "row" }}
                         >
                             <FormControlLabel value="Phone" control={<Radio required={true}/>} label="Phone" />
-                            <FormControlLabel value="Email" control={<Radio required={true}/>} label="Email" />
+                            <FormControlLabel value="CMS" control={<Radio required={true}/>} label="CMS" />
                             <FormControlLabel value="Podium" control={<Radio required={true}/>} label="Podium" />
                         </RadioGroup>
                     </FormControl>
@@ -347,11 +339,11 @@ export default function FrontLoadReport({report, reportID}) {
                             value={reportData.howHear}
                             onChange={(event) => handleInputChange(event, "howHear")}
                         >
-                            <MenuItem value="kijiji">Kijiji</MenuItem>
-                            <MenuItem value="facebook">Facebook</MenuItem>
-                            <MenuItem value="word-of-mouth">Word of Mouth</MenuItem>
-                            <MenuItem value="google">Google</MenuItem>
-                            <MenuItem value="other">Other</MenuItem>
+                            <MenuItem value="Kijiji">Kijiji</MenuItem>
+                            <MenuItem value="Facebook">Facebook</MenuItem>
+                            <MenuItem value="Word of Mouth">Word of Mouth</MenuItem>
+                            <MenuItem value="Google">Google</MenuItem>
+                            <MenuItem value="Other">Other</MenuItem>
                         </Select>
                     </FormControl>
                     {reportData.howHear === "other" && (

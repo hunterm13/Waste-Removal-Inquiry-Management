@@ -77,9 +77,19 @@ export default function Report() {
     }
 
     if(report.service) {
-        return <>
-            <InsideSaleReport report={report} reportID={reportID} />
-        </>;
+        if(report.service === "Fencing" || report.service === "Junk Removal" || report.service === "Portable Toilet" || report.service === "Roll Off"){
+            return <>
+                <InsideSaleReport report={report} reportID={reportID} />
+            </>;
+        } else if (report.service === "Front Load") {
+            return <>
+                <FrontLoadReport report={report} reportID={reportID} />
+            </>;
+        } else {
+            return <>
+                <OtherReport report={report} reportID={reportID} />
+            </>;
+        }        
     }
 
     if (!report.reportType && !report.service) {

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getUserFirstName, getUserKpi, getUserLastName } from "../utils/queries";
 import KpiSingleBar from "./KpiSingleBar";
 
-export default function KpiRow({userID}) {
+export default function KpiRow({userID, startDate, endDate}) {
     const [loading, setLoading] = useState(true);
     const [conversions, setConversions] = useState(0);
     const [inquiries, setInquiries] = useState(0);
@@ -13,7 +13,7 @@ export default function KpiRow({userID}) {
     useEffect(() => {
         const fetchUserKpi = async () => {
             try {
-                const response = await getUserKpi(userID);
+                const response = await getUserKpi(userID,startDate,endDate);
                 setConversions(response.totalConversions);
                 setInquiries(response.totalInquiries);
                 setLoading(false);
@@ -40,7 +40,7 @@ export default function KpiRow({userID}) {
         fetchUserKpi();
         fetchUserFirstName();
         fetchUserLastName();
-    }, []);
+    }, [startDate, endDate]);
 
     if (loading) {
         return <>

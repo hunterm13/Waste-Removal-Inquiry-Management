@@ -3,7 +3,7 @@ import { getAllUserID } from "../utils/queries";
 import  KpiRow  from "./KpiRow";
 import { Paper, Typography, CircularProgress, Table, TableContainer, TableRow, TableHead, TableCell, TableBody, Container } from "@mui/material";
 
-export default function AllUserKpiTable () {
+export default function AllUserKpiTable ({startDate, endDate}) {
     const [loading, setLoading] = useState(true);
     const [userIDs, setUserIDs] = useState("");
 
@@ -41,7 +41,7 @@ export default function AllUserKpiTable () {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {userIDs.map(userID => <KpiRow key={userID} userID={userID} />)}
+                    {userIDs.map(userID => <KpiRow key={userID} userID={userID} startDate={startDate} endDate={endDate} />)}
                 </TableBody>
             </Table>
         </TableContainer>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Container, Typography, Button, Select, MenuItem } from "@mui/material";
-import { getAdminStatus, fetchUsers, enableUserByID, disableUserByID } from "../utils/queries";
+import { getAdminStatus, fetchUsers, enableUserByID, disableUserByID, fixHowHeard, updateReportsWithUserName, updateReportsWithService, fixPhoneNumbers, listAllSiteNumbers, fixLeadChannels } from "../utils/queries";
 import { auth } from "../utils/firebaseConfig";
 
 export default function AdminPage() {
@@ -59,6 +59,15 @@ export default function AdminPage() {
                 setUsers(updatedUsers);
             }
         }
+    };
+
+    const fixThings = async () => {
+        //fixHowHeard();
+        //updateReportsWithUserName();
+        //updateReportsWithService();
+        //fixPhoneNumbers();
+        //console.log(listAllSiteNumbers())
+        //fixLeadChannels();
     };
 
     if (!isAuthInitialized || loading) {
@@ -125,7 +134,8 @@ export default function AdminPage() {
                                 ))}
                             </TableBody>
                         </Table>
-                    </TableContainer>
+                    </TableContainer>                    
+                    {/* <Button onClick={fixThings}>fix broken thing</Button> */}
                 </Container>
         );
     } else {

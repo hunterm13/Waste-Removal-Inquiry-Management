@@ -107,10 +107,8 @@ export const newReport = async (reportData, newReportType) => {
             if (reportData.service === "Roll Off" && !reportData.binSize) {
                 throw new Error("Bin size is missing");
             }
-            if (reportData.siteNumber) {
-                reportData.siteNumber = reportData.siteNumber
-                    .split(",")
-                    .map((number) => number.trim());
+            if (reportData.siteNumber && reportData.siteNumber.toLowerCase().trim() !== "na") {
+                reportData.siteNumber = reportData.siteNumber.replace(/\s/g, "");
             }
     
             reportData.dateReported = serverTimestamp();
@@ -125,18 +123,18 @@ export const newReport = async (reportData, newReportType) => {
             if (!reportData.notes) {
                 throw new Error("Required fields are missing");
             }    
-            if (reportData.siteNumber) {
-                reportData.siteNumber = reportData.siteNumber
-                    .split(",")
-                    .map((number) => number.trim());
+            if (reportData.siteNumber && reportData.siteNumber.toLowerCase().trim() !== "na") {
+                reportData.siteNumber = reportData.siteNumber.replace(/\s/g, "");
             }
 
             const newReportData = {
+                service: reportData.reportType,
                 notes: reportData.notes,
                 userID: reportData.userID,
                 siteNumber: reportData.siteNumber,
                 dateReported: serverTimestamp(),
                 reportType: newReportType,
+                userName: reportData.userName
             };
 
             await addDoc(newReportRef, newReportData);
@@ -152,10 +150,12 @@ export const newReport = async (reportData, newReportType) => {
             }
 
             const newReportData = {
+                service: reportData.reportType,
                 notes: reportData.notes,
                 userID: reportData.userID,
                 dateReported: serverTimestamp(),
                 reportType: newReportType,
+                userName: reportData.userName
             };
             await addDoc(newReportRef, newReportData);
 
@@ -220,10 +220,11 @@ export const updateReportById = async (reportId, reportData) => {
                 throw new Error("Bin size is missing");
             } else if (!reportData.service || !reportData.workFlow || !reportData.city || !reportData.region || !reportData.siteName || !reportData.siteAddress || !reportData.contactEmail || !reportData.leadChannel || !reportData.leadTag || !reportData.siteNumber || !reportData.howHear) {
                 throw new Error("Required fields are missing");
-            } else if (reportData.siteNumber.length > 1) {
-                reportData.siteNumber = reportData.siteNumber
-                    .split(",")
-                    .map((number) => number.trim());
+            } else if (!reportData.siteNumber) {
+                throw new Error("Phone number is missing");
+            } else
+            if (reportData.siteNumber && reportData.siteNumber.toLowerCase().trim() !== "na") {
+                reportData.siteNumber = reportData.siteNumber.replace(/\s/g, "");
             }
             await setDoc(reportRef, updatedData, { merge: true });
         } catch (error) {
@@ -255,6 +256,9 @@ export const updateReportById = async (reportId, reportData) => {
             } else if (!reportData.siteNumber) {
                 throw new Error("Site phone number is missing");
             }
+            if (reportData.siteNumber && reportData.siteNumber.toLowerCase().trim() !== "na") {
+                reportData.siteNumber = reportData.siteNumber.replace(/\s/g, "");
+            }
             await setDoc(reportRef, updatedData, { merge: true });
           } catch (error) {
             throw error;
@@ -262,19 +266,51 @@ export const updateReportById = async (reportId, reportData) => {
     }
 };
 
-export const getUserKpi = async (userID) => {
+export const getUserKpi = async (userID, startDate, endDate) => {
     const reportsRef = collection(db, "reports");
-    const q = query(
+    let q = query(
         reportsRef,
         where("userID", "==", userID)
     );
+
+    if (startDate && endDate) {
+        const startTimestamp = new Date(startDate);
+        startTimestamp.setHours(0, 0, 0, 0);
+        const endTimestamp = new Date(endDate);
+        endTimestamp.setHours(23, 59, 59, 999);
+
+        q = query(
+            reportsRef,
+            where("userID", "==", userID),
+            where("dateReported", ">=", startTimestamp),
+            where("dateReported", "<=", endTimestamp)
+        );
+    } else if (startDate) {
+        const startTimestamp = new Date(startDate);
+        startTimestamp.setHours(0, 0, 0, 0);
+
+        q = query(
+            reportsRef,
+            where("userID", "==", userID),
+            where("dateReported", ">=", startTimestamp)
+        );
+    } else if (endDate) {
+        const endTimestamp = new Date(endDate);
+        endTimestamp.setHours(23, 59, 59, 999);
+
+        q = query(
+            reportsRef,
+            where("userID", "==", userID),
+            where("dateReported", "<=", endTimestamp)
+        );
+    }
 
     const querySnapshot = await getDocs(q);
     const totalInquiries = querySnapshot.size;
     const totalConversions = querySnapshot.size - querySnapshot.docs.filter(doc => doc.data().leadTag === "Lost" || !doc.data().leadTag).length;
 
     return { totalInquiries, totalConversions };
-}; 
+};
 
 export const getAllUserID = async () => {
     try {
@@ -437,8 +473,98 @@ export const updateReportsWithUserName = async () => {
         await setDoc(reportRef, { userName }, { merge: true });
       }
     }
+    console.log("Reports updated with userName");
   } catch (error) {
     console.error("Error updating reports with userName:", error);
     throw error;
   }
+};
+
+export const updateReportsWithService = async () => {
+    try {
+        const reports = await getAllReports();
+
+        for (const report of reports) {
+            if (!report.service) {
+                const reportRef = doc(db, "reports", report.id);
+                await setDoc(reportRef, { service: report.reportType }, { merge: true });
+            }
+        }
+        console.log("Reports updated with service");
+    } catch (error) {
+        console.error("Error updating reports with service:", error);
+        throw error;
+    }
+};
+
+//fixes issue with howHear field in reports
+export const fixHowHeard = async () => {
+    try {
+        const reports = await getAllReports();
+
+        reports.forEach(async (report) => {
+            const reportRef = doc(db, "reports", report.id);
+
+            if (report.howHear === "kijiiji") {
+                await setDoc(reportRef, { howHear: "Kijiji" }, { merge: true });
+            } else if (report.howHear === "google") {
+                await setDoc(reportRef, { howHear: "Google" }, { merge: true });
+            } else if (report.howHear === "other") {
+                await setDoc(reportRef, { howHear: "Other" }, { merge: true });
+            } else if (report.howHear === "facebook") {
+                await setDoc(reportRef, { howHear: "Facebook" }, { merge: true });
+            } else if (report.howHear === "word-of-mouth") {
+                await setDoc(reportRef, { howHear: "Word of Mouth" }, { merge: true });
+            }
+        });
+    } catch (error) {
+        console.error("Error fixing report howHear:", error);
+        throw error;
+    }
+};
+
+export const fixPhoneNumbers = async () => {
+    try {
+        const reports = await getAllReports();
+
+        reports.forEach(async (report) => {
+            const reportRef = doc(db, "reports", report.id);
+
+            if (Array.isArray(report.siteNumber)) {
+                const newPhoneNumber = report.siteNumber[0].replace(/\s/g, "");
+                await setDoc(reportRef, { siteNumber: newPhoneNumber }, { merge: true });
+            }
+        });
+    } catch (error) {
+        console.error("Error fixing phone numbers:", error);
+        throw error;
+    }
+};
+
+export const listAllSiteNumbers = async () => {
+    try {
+        const reports = await getAllReports();
+        const siteNumbers = reports.map(report => report.siteNumber);
+        return siteNumbers;
+    } catch (error) {
+        console.error("Error listing all site numbers:", error);
+        throw error;
+    }
+};
+
+export const fixLeadChannels = async () => {
+    try {
+        const reports = await getAllReports();
+
+        reports.forEach(async (report) => {
+            const reportRef = doc(db, "reports", report.id);
+
+            if (report.leadChannel === "Email") {
+                await setDoc(reportRef, { leadChannel: "CMS" }, { merge: true });
+            }
+        });
+    } catch (error) {
+        console.error("Error fixing lead channel:", error);
+        throw error;
+    }
 };

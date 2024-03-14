@@ -263,13 +263,11 @@ const AllReportsTable = () => {
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.service || report.reportType}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.dateReported.toDate().toLocaleDateString()}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>
-                                        {!report.service ? "---" : (
-                                            <Tooltip title={report.siteNumber.join(", ")} placement="top">
-                                                <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                                    {report.siteNumber.join(", ")}
-                                                </div>
-                                            </Tooltip>
-                                        )}
+                                        <Tooltip title={report.siteNumber} placement="top">
+                                            <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                                {report.siteNumber}
+                                            </div>
+                                        </Tooltip>
                                     </TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service ? "---" : report.contactName}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service ? "---" : report.siteName}</TableCell>

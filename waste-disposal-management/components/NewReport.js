@@ -62,11 +62,13 @@ export default function NewReport({ userID, reportType }) {
             });
         } else if (reportType === "Front Load") {
             setReport({
+                service: "Front Load",
                 notes: "",
                 userID: userID,
             });
         } else if (reportType === "Swap" || reportType === "Other" || reportType === "Removal") {
             setReport({
+                service: reportType,
                 siteNumber: "",
                 notes: "",
                 userID: userID,
@@ -103,13 +105,6 @@ export default function NewReport({ userID, reportType }) {
                 setError("Removal date cannot be before delivery date");
                 return;
             }
-        }
-        const phoneNumberArray = report.siteNumber.split(",").map(number => number.trim());
-        // Check if phone number array contains only numbers
-        const containsOnlyNumbers = phoneNumberArray.every(number => /^\d+$/.test(number));
-        if (!containsOnlyNumbers) {
-            setError("Phone number format is incorrect, please use numbers only and separate with commas");
-            return;
         }
         const submitInsideSaleReport = async () => {
             await newReport(report, reportType);
@@ -234,7 +229,7 @@ export default function NewReport({ userID, reportType }) {
                     <FormControl  sx={{width:"30%"}}>
                         <TextField
                             required
-                            helperText="Numbers only, use comma to separate."
+                            helperText="If not available, enter 'NA'"
                             label="Contact Number"
                             value={report.siteNumber}
                             onChange={(event) => handleInputChange(event, "siteNumber")}
@@ -295,7 +290,7 @@ export default function NewReport({ userID, reportType }) {
                             style={{ display: "flex", flexDirection: "row" }}
                         >
                             <FormControlLabel value="Phone" control={<Radio required={true}/>} label="Phone" />
-                            <FormControlLabel value="Email" control={<Radio required={true}/>} label="Email" />
+                            <FormControlLabel value="CMS" control={<Radio required={true}/>} label="CMS" />
                             <FormControlLabel value="Podium" control={<Radio required={true}/>} label="Podium" />
                         </RadioGroup>
                     </FormControl>
@@ -336,14 +331,14 @@ export default function NewReport({ userID, reportType }) {
                             value={report.howHear}
                             onChange={(event) => handleInputChange(event, "howHear")}
                         >
-                            <MenuItem value="kijiji">Kijiji</MenuItem>
-                            <MenuItem value="facebook">Facebook</MenuItem>
-                            <MenuItem value="word-of-mouth">Word of Mouth</MenuItem>
-                            <MenuItem value="google">Google</MenuItem>
-                            <MenuItem value="other">Other</MenuItem>
+                            <MenuItem value="Kijiji">Kijiji</MenuItem>
+                            <MenuItem value="Facebook">Facebook</MenuItem>
+                            <MenuItem value="Word of Mouth">Word of Mouth</MenuItem>
+                            <MenuItem value="Google">Google</MenuItem>
+                            <MenuItem value="Other">Other</MenuItem>
                         </Select>
                     </FormControl>
-                    {report.howHear === "other" && (
+                    {report.howHear === "Other" && (
                     <FormControl sx={{ width: "40%" }}>
                         <TextField
                         required

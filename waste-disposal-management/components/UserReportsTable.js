@@ -26,7 +26,6 @@ const UserReportsTable = ({ uid }) => {
                 setLoading(false);
             }
         };
-
         fetchUserReports();
     }, []);
 
@@ -74,7 +73,7 @@ const UserReportsTable = ({ uid }) => {
                 return true;
         }
     }).filter((report) => {
-        if (!showOther && !report.service) {
+        if (!showOther && (report.service == "Other" || report.reportType == "Removal" || report.service == "Front Load" || report.reportType == "Swap")) {
             return false;
         }
         return true;
@@ -248,16 +247,15 @@ const UserReportsTable = ({ uid }) => {
                     {sortedReports
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         .map((report) => {
-                            console.log(report); // Log the report
                             return (
                                 <TableRow key={report.id}>
                                     <TableCell>{report.service || report.reportType}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.dateReported.toDate().toLocaleDateString()}</TableCell>
-                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service ? "---" : report.city}</TableCell>
-                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service ? "---" : report.contactName}</TableCell>
+                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.city ? "---" : report.city}</TableCell>
+                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.contactName ? "---" : report.contactName}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service || !report.deliveryDate ? "---": report.deliveryDate}</TableCell>
-                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service ? "---" : report.siteName}</TableCell>
-                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.service ? "---" : report.contactEmail}</TableCell>
+                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.siteName ? "---" : report.siteName}</TableCell>
+                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{!report.contactEmail ? "---" : report.contactEmail}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>
                                         <Button variant='contained' onClick={() => redirectToReport(report.id)}>View</Button>
                                     </TableCell>
