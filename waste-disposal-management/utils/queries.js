@@ -568,3 +568,50 @@ export const fixLeadChannels = async () => {
         throw error;
     }
 };
+
+const checkDate = async (reportType, reportDate) => {
+    try {
+        const reportsRef = collection(db, reportType);
+        const q = query(reportsRef, where("id", "==", reportDate));
+        const querySnapshot = await getDocs(q);
+        const exists = !querySnapshot.empty;
+        return exists;
+    } catch (error) {
+        console.error("Error checking date: ", error);
+        throw error;
+    }
+}
+
+// used for adding cms, telus, podium, or tower report data
+export const addNewReportData = async (reportType, reportData, reportDate) => {
+    try{
+        if(reportData.length === 0) {
+            throw new Error("No data to upload");
+        }
+        if(await checkDate(reportType, reportDate)){
+            throw new Error("Report already exists for this date");
+        }
+        switch(reportType) {
+            case "cms":
+                const cmsRef = doc(collection(db, "cms"), reportDate);
+                await setDoc(cmsRef, { data: reportData });
+                break;
+            case "telus":
+                const telusRef = doc(collection(db, "telus"), reportDate);
+                await setDoc(telusRef, { data: reportData });
+                break;
+            case "podium":
+                const podiumRef = doc(collection(db, "podium"), reportDate);
+                await setDoc(podiumRef, { data: reportData });
+                break;
+            case "tower":
+                const towerRef = doc(collection(db, "tower"), reportDate);
+                await setDoc(towerRef, { data: reportData });
+                break;
+            default:
+                throw new Error("Invalid report type");
+        }
+    } catch (error) {
+        throw error;
+    }
+};
