@@ -4,6 +4,17 @@ import { getAdminStatus, getAllReports } from "../utils/queries";
 import { AlertTitle, FormControl, Container, InputLabel, Typography, CircularProgress, Select, MenuItem, Button, Alert } from "@mui/material";
 import FileDropzone from "../components/FileDropzone";
 import dayjs from "dayjs";
+import ConversionReportGenerator from "../components/AccuracyReportGenerator";
+import { styled } from "@mui/system";
+
+const FadeAlert = styled(Alert)(({ theme }) => ({
+    opacity: 0,
+    marginBottom: '1rem',
+    transition: 'opacity 0.1s ease-in-out',
+    '&.show': {
+      opacity: 1,
+    },
+  }));
 
 export default function ConversionReport() {
     const [loading, setLoading] = useState(true);
@@ -90,11 +101,8 @@ export default function ConversionReport() {
             </Container>
         )}
         {creatingReport && (
-            <Container>
-                <Typography variant="h4" component="h2">
-                    Creating Report
-                </Typography>
-                <CircularProgress />
+            <Container maxWidth="xl">
+                <ConversionReportGenerator />
                 <Container>
                     <Button variant="contained" color="secondary" onClick={() => {
                         setUploadingFile(false);

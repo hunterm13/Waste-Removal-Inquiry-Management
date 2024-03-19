@@ -572,7 +572,7 @@ export const fixLeadChannels = async () => {
 const checkDate = async (reportType, reportDate) => {
     try {
         const reportsRef = collection(db, reportType);
-        const q = query(reportsRef, where("id", "==", reportDate));
+        const q = query(reportsRef, where("data.date", "==", reportDate));
         const querySnapshot = await getDocs(q);
         const exists = !querySnapshot.empty;
         return exists;
@@ -583,29 +583,29 @@ const checkDate = async (reportType, reportDate) => {
 }
 
 // used for adding cms, telus, podium, or tower report data
-export const addNewReportData = async (reportType, reportData, reportDate) => {
+export const addNewReportData = async (reportType, reportData) => {
     try{
         if(reportData.length === 0) {
             throw new Error("No data to upload");
         }
-        if(await checkDate(reportType, reportDate)){
+        if(await checkDate(reportType, reportData.date)){
             throw new Error("Report already exists for this date");
         }
         switch(reportType) {
             case "cms":
-                const cmsRef = doc(collection(db, "cms"), reportDate);
+                const cmsRef = doc(collection(db, "cms"));
                 await setDoc(cmsRef, { data: reportData });
                 break;
             case "telus":
-                const telusRef = doc(collection(db, "telus"), reportDate);
+                const telusRef = doc(collection(db, "telus"));
                 await setDoc(telusRef, { data: reportData });
                 break;
             case "podium":
-                const podiumRef = doc(collection(db, "podium"), reportDate);
+                const podiumRef = doc(collection(db, "podium"));
                 await setDoc(podiumRef, { data: reportData });
                 break;
             case "tower":
-                const towerRef = doc(collection(db, "tower"), reportDate);
+                const towerRef = doc(collection(db, "tower"));
                 await setDoc(towerRef, { data: reportData });
                 break;
             default:
@@ -615,3 +615,30 @@ export const addNewReportData = async (reportType, reportData, reportDate) => {
         throw error;
     }
 };
+
+const getCollectionData = async (collectionName, startDate, endDate) => {
+    const ref = collection(db, collectionName); // Use collectionGroup instead of collection
+    const queryRef = query(ref, where("data.date", ">=", startDate), where("data.date", "<=", endDate));
+    const snapshot = await getDocs(queryRef);
+    const data = [];
+    snapshot.forEach((doc) => {
+        data.push(doc.data());
+    });
+    return data;
+}
+
+export const getConversionData = async (startDate, endDate) => {
+    try {
+        const conversionData = {
+            telusData: await getCollectionData("telus", startDate, endDate),
+            podiumData: await getCollectionData("podium", startDate, endDate),
+            towerData: await getCollectionData("tower", startDate, endDate),
+            cmsData: await getCollectionData("cms", startDate, endDate)
+        };
+        console.log(conversionData);
+        return conversionData;
+    } catch (error) {
+        console.error("Error retrieving conversion data:", error);
+        throw error;
+    }
+}

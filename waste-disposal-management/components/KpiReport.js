@@ -17,6 +17,13 @@ export default function KpiReport({employee, users, service, leadTag, leadChanne
                 setFetchedReports(allReports); // Store raw data in fetchedReports
                 let tempReports = [...allReports];
                 tempReports = tempReports.filter(report => report.dateReported.toDate().valueOf() >= startDate.valueOf() && report.dateReported.toDate().valueOf() <= endDate.valueOf());
+                if(adminsFiltered) {
+                    tempReports = tempReports.filter(report => {
+                        const user = usersMap.get(report.userID);
+                        // Exclude the report if the user is an admin
+                        return user ? !user[1] : true;
+                    });
+                }  
                 setReports(tempReports); // Store raw data in reports
                 setLoading(false);
             } catch (error) {

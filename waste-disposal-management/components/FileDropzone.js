@@ -6,6 +6,16 @@ import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { addNewReportData } from '../utils/queries';
+import { styled } from "@mui/system";
+
+const FadeAlert = styled(Alert)(({ theme }) => ({
+    opacity: 0,
+    marginBottom: '1rem',
+    transition: 'opacity 0.1s ease-in-out',
+    '&.show': {
+      opacity: 1,
+    },
+  }));
 
 const baseStyle = {
   flex: 1,
@@ -43,6 +53,7 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
     const [fileData, setFileData] = useState({});
     const [error, setError] = useState(null);
     const [reportDate, setReportDate] = useState(null);
+    const [show, setShow] = useState(false);
 
     useEffect(() => {
         setUploadedFileData({});
@@ -50,21 +61,18 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
     }, []);
 
     useEffect(() => {
-        if (fileData && Object.keys(fileData).length !== 0) {
-            try{
-                const formattedDate = dayjs(reportDate).format('MM-DD-YYYY');
-                console.log(fileData);
-                const uploadReportData = async () => {
-                    await addNewReportData(formType, fileData, formattedDate);
-                    
-                };
-                uploadReportData();
-                setFileData({});
-                setSuccess(true);
-                setUploadingFile(false);
-            } catch (error) {
-                setError(error);
-            }
+        if (fileData && Object.keys(fileData).length !== 0) {             
+            const uploadReportData = async () => {
+                try{
+                    await addNewReportData(formType, fileData);
+                    setFileData({});
+                    setSuccess(true);
+                    setUploadingFile(false);
+                } catch (error) {
+                    setError(error.message);
+                }
+            };
+            uploadReportData();
         }
     }, [fileData]);
 
@@ -140,16 +148,20 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
         // if(!confirmUpload) {
         //     return;
         // }
+        const formattedDate = dayjs(reportDate).format('MM-DD-YYYY');
+        setFileData({});
         if(formType === "cms") {
-            setFileData(
-                uploadedFileData.slice(1).map(data => ({
+            setFileData({
+                date: formattedDate,
+                ...uploadedFileData.slice(1).map(data => ({
                     name: data["CMS Led board"],
                     leads: data["__EMPTY_1"]
                 }))
-            );
+            });
         }else if(formType === "telus") {
-            setFileData(
-                uploadedFileData.reduce((acc, data) => {
+            setFileData({
+                date: formattedDate,
+                ...uploadedFileData.reduce((acc, data) => {
                     if (parseFloat(data["Call Length"]) >= 0.00277778) {
                         const existingData = acc.find((item) => item.name === data["To Name"]);
                         if (existingData) {
@@ -160,33 +172,45 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                     }
                     return acc;
                 }, [])
-            );
+            });
         }else if(formType === "podium") {
-            setFileData(
-                uploadedFileData.slice(1).map(data => ({
+            setFileData({
+                date: formattedDate,
+                ...uploadedFileData.slice(1).map(data => ({
                     name: data['Podium Led board'],
                     leads: data['__EMPTY_1']
                 }))
-            );
+            });
         }else if(formType === "tower") {
-            setFileData(
-                uploadedFileData.map(data => ({
+            setFileData({
+                date: formattedDate,
+                ...uploadedFileData.map(data => ({
                 siteName: data['Site Name'],
                 workFlow: data['Workflow'],
                 orderDate: data['Order Date'],
                 name: data['Order Taken By']
                 }))
-            );
+            });
         }else{
             alert("Invalid form type. Please select a valid form type.");
         }
     };
 
-    return (
+    useEffect(() => {
+        if (error) {
+          setShow(true);
+          setTimeout(() => {
+            setError("");
+            setShow(false);
+          }, 5000);
+        }
+      }, [error]);
+
+    return <>
         <div className="container">
-            {error && <Alert severity="error" style={{marginBottom:"1rem"}} onClose={() => setError("")}> 
-                <AlertTitle>{error}</AlertTitle>                
-            </Alert>}
+            <FadeAlert severity='error' className={show ? 'show' : ''} onClose={() => setError("")}>
+                <AlertTitle>{error}</AlertTitle>
+            </FadeAlert>
             <div {...getRootProps({style})}>
                 <input {...getInputProps()} />
                 <p>Drag and drop a file here, or click to select file.</p>
@@ -212,5 +236,5 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                 <Button disabled={!fileUploaded || reportDate === null} style={{marginTop:"1rem"}} onClick={processFile} variant="contained">Upload</Button>
             </Box>
         </div>
-    );
+    </>
 }
