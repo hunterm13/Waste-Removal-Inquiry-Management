@@ -4,8 +4,9 @@ import { getAdminStatus, getAllReports } from "../utils/queries";
 import { AlertTitle, FormControl, Container, InputLabel, Typography, CircularProgress, Select, MenuItem, Button, Alert } from "@mui/material";
 import FileDropzone from "../components/FileDropzone";
 import dayjs from "dayjs";
-import ConversionReportGenerator from "../components/AccuracyReportGenerator";
+import ConversionReportGenerator from "../components/ConversionReportGenerator";
 import { styled } from "@mui/system";
+import AccuracyReportGenerator from "../components/AccuracyReportGenerator";
 
 const FadeAlert = styled(Alert)(({ theme }) => ({
     opacity: 0,
@@ -20,10 +21,11 @@ export default function ConversionReport() {
     const [loading, setLoading] = useState(true);
     const [isAuthInitialized, setIsAuthInitialized] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [creatingReport, setCreatingReport] = useState(false);
+    const [creatingAccuracyReport, setCreatingAccuracyReport] = useState(false);
     const [uploadingFile, setUploadingFile] = useState(false);
     const [formUploadingType, setformUploadingType] = useState("Please Select a Report Type");
     const [success, setSuccess] = useState(false);
+    const [creatingConversionReport, setCreatingConversionReport] = useState(false);
 
     useEffect(() => {
         const unregisterAuthObserver = auth.onAuthStateChanged(async user => {
@@ -66,14 +68,15 @@ export default function ConversionReport() {
             </Container>
         )}
         <Container maxWidth="md">
-            <Typography variant="h2" component="h1" align="center">
+            <Typography variant="h2" component="h1" align="center" style={{marginBottom:"2rem"}}>
                 Conversion Report
             </Typography>
             
-            {!uploadingFile && !creatingReport && (
+            {!uploadingFile && !creatingAccuracyReport && !creatingConversionReport && (
             <Container maxWidth="sm" style={{display:"flex", justifyContent: "space-around", marginTop:"3rem"}}>
                 <Button variant="contained" onClick={() => setUploadingFile(true)}>Upload File</Button>
-                <Button variant="contained" onClick={() => setCreatingReport(true)}>Create Report</Button>
+                <Button variant="contained" onClick={() => setCreatingConversionReport(true)}>View Conversion</Button>
+                <Button variant="contained" onClick={() => setCreatingAccuracyReport(true)}>View Accuracy</Button>
             </Container>
             )}
         </Container>
@@ -100,13 +103,24 @@ export default function ConversionReport() {
                 {formUploadingType !== "Please Select a Report Type" && <FileDropzone formType={formUploadingType} setSuccess={setSuccess} setUploadingFile={setUploadingFile}/>}
             </Container>
         )}
-        {creatingReport && (
+        {creatingAccuracyReport && (
+            <Container maxWidth="xl">
+                <AccuracyReportGenerator />
+                <Container>
+                    <Button variant="contained" color="secondary" onClick={() => {
+                        setUploadingFile(false);
+                        setCreatingAccuracyReport(false);
+                    }}>Cancel</Button>
+                </Container>
+            </Container>
+        )}
+        {creatingConversionReport && (
             <Container maxWidth="xl">
                 <ConversionReportGenerator />
                 <Container>
                     <Button variant="contained" color="secondary" onClick={() => {
                         setUploadingFile(false);
-                        setCreatingReport(false);
+                        setCreatingConversionReport(false);
                     }}>Cancel</Button>
                 </Container>
             </Container>

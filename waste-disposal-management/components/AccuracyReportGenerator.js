@@ -1,13 +1,13 @@
-import { CircularProgress, Collapse, IconButton, Typography, Table, TableHead, Paper, TableRow, TableCell, TableBody, Container, TableContainer } from '@mui/material';
+import { Select, MenuItem, FormControl, InputLabel, CircularProgress, Typography, Table, TableHead, Paper, TableRow, TableCell, TableBody, Container, TableContainer } from '@mui/material';
 import {useState, useEffect} from 'react';
 import { getConversionData } from '../utils/queries';
-import { ExpandMore, ExpandLess } from '@mui/icons-material';
 
 export default function AccuracyReportGenerator({startDate, endDate}) {
     const [loading, setLoading] = useState(true);
     const [reportData, setReportData] = useState([]);
     const [open, setOpen] = useState(false);
-
+    const [users, setUsers] = useState(null);
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
         const fetchReportData = async () => {
@@ -23,6 +23,10 @@ export default function AccuracyReportGenerator({startDate, endDate}) {
         //fetchReportData();
         setLoading(false);
     }, []);
+
+    const filterUser = (user) => {
+        setUser(user);
+    }
     
     if (loading) {
         return <>
@@ -32,6 +36,19 @@ export default function AccuracyReportGenerator({startDate, endDate}) {
         </>
     }
     return <>
+        <Container maxWidth="md" style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1rem"}}>
+            <FormControl style={{width:"250px"}}>
+                <InputLabel id="select-user">Select User</InputLabel>
+                <Select label="Select User" value={users} onChange={(e) => filterUser(e.target.value)}>
+                    <MenuItem value="user1">User 1</MenuItem>
+                    <MenuItem value="user2">User 2</MenuItem>
+                    <MenuItem value="user3">User 3</MenuItem>
+                </Select>
+            </FormControl>
+            <Typography variant="h5" component="body" align="center">
+                Viewing Accuracy Report for {user}
+            </Typography>
+        </Container>
         <TableContainer component={Paper}>
             <Table>
                 <TableHead sx={{backgroundColor: "#333333"}}>

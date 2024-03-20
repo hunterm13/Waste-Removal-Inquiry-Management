@@ -7,6 +7,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { addNewReportData } from '../utils/queries';
 import { styled } from "@mui/system";
+import ExcelJS from 'exceljs';
 
 const FadeAlert = styled(Alert)(({ theme }) => ({
     opacity: 0,
@@ -85,6 +86,7 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
         }
         acceptedFiles.forEach((file) => {
             setFileName(file.name);
+
             const reader = new FileReader();
         
             reader.onabort = () => console.log('file reading was aborted');
@@ -92,7 +94,7 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
             reader.onload = () => {
                 // Parse the file
                 const binaryStr = reader.result;
-                const workbook = XLSX.read(binaryStr, {type:'binary'});
+                const workbook = XLSX.read(binaryStr, {type:'binary', cellStyles: true});
                 let sheetName;
                 switch(formType) {
                     case "tower":
@@ -110,9 +112,22 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
 
                 const worksheet = workbook.Sheets[sheetName];
                 const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                setUploadedFileData(jsonData);
-                setFileUploaded(true);
-                console.log('JSON data:', jsonData);
+                if (formType === "tower") {
+                    const updatedData = jsonData.map((item, index) => {
+                        const cell = `A${index + 2}`;
+                        const cellColor = worksheet[cell].s && worksheet[cell].s.fgColor ? worksheet[cell].s.fgColor.rgb : null;
+                        const isCancelled = cellColor === 'FF99CC' ? true : false;
+                        return { ...item, Cancelled: isCancelled, CellColor: cellColor };
+                    });
+                    const filteredData = updatedData.filter(item => item.CellColor === 'FF99CC' || item.CellColor === 'CCFFFF');
+                    setUploadedFileData(filteredData);
+                    setFileUploaded(true);
+                    console.log(filteredData);
+                }
+                else{
+                    setUploadedFileData(jsonData);
+                    setFileUploaded(true);
+                }                
             };
             reader.readAsBinaryString(file);
         });
@@ -144,10 +159,10 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
     ]);
 
     const processFile = () => {
-        // const confirmUpload = window.confirm("Please confirm file matches the correct report type and date.");
-        // if(!confirmUpload) {
-        //     return;
-        // }
+        const confirmUpload = window.confirm("Please confirm file matches the correct report type and date.");
+        if(!confirmUpload) {
+            return;
+        }
         const formattedDate = dayjs(reportDate).format('MM-DD-YYYY');
         setFileData({});
         if(formType === "cms") {
@@ -185,10 +200,11 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
             setFileData({
                 date: formattedDate,
                 ...uploadedFileData.map(data => ({
-                siteName: data['Site Name'],
-                workFlow: data['Workflow'],
-                orderDate: data['Order Date'],
-                name: data['Order Taken By']
+                    cancelled: data['Cancelled'],
+                    siteName: data['Site Name'],
+                    workFlow: data['Workflow'],
+                    orderDate: data['Order Date'],
+                    name: data['Order Taken By']
                 }))
             });
         }else{

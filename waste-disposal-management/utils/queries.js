@@ -605,8 +605,11 @@ export const addNewReportData = async (reportType, reportData) => {
                 await setDoc(podiumRef, { data: reportData });
                 break;
             case "tower":
-                const towerRef = doc(collection(db, "tower"));
-                await setDoc(towerRef, { data: reportData });
+                const towerRef = collection(db, "tower");
+                delete reportData.date;
+                for (const key in reportData) {
+                    await addDoc(towerRef, { data: reportData[key] });
+                }
                 break;
             default:
                 throw new Error("Invalid report type");
