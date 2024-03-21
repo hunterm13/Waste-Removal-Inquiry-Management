@@ -588,8 +588,8 @@ export const addNewReportData = async (reportType, reportData) => {
         if(reportData.length === 0) {
             throw new Error("No data to upload");
         }
-        if(await checkDate(reportType, reportData.date)){
-            throw new Error("Report already exists for this date");
+        if(reportType != "tower") {
+            checkDate(reportType, reportData.date);
         }
         switch(reportType) {
             case "cms":
@@ -607,9 +607,41 @@ export const addNewReportData = async (reportType, reportData) => {
             case "tower":
                 const towerRef = collection(db, "tower");
                 delete reportData.date;
+                let promises = [];
                 for (const key in reportData) {
-                    await addDoc(towerRef, { data: reportData[key] });
+                    promises.push(
+                        (async () => {
+                            const towerQuery = query(
+                                towerRef,
+                                where("data.orderDate", "==", reportData[key].orderDate),
+                                where("data.name", "==", reportData[key].name),
+                                where("data.workFlow", "==", reportData[key].workFlow),
+                                where("data.siteName", "==", reportData[key].siteName)
+                            );
+
+                            const towerSnapshot = await getDocs(towerQuery);
+
+                            if (!towerSnapshot.empty) {
+                                const towerData = towerSnapshot.docs[0].data();
+                                if (!towerData.data.cancelled && reportData[key].cancelled) {
+                                    console.log("Cancelled order found");
+                                    await setDoc(towerSnapshot.docs[0].ref, { data: { ...towerData.data, cancelled: true } }, { merge: true });
+                                }
+                            } else {
+                                // Check for duplicates before adding a new document
+                                const duplicateQuery = query(towerRef, where("data", "==", reportData[key]));
+                                const duplicateSnapshot = await getDocs(duplicateQuery);
+                                if (duplicateSnapshot.empty) {
+                                    if (["DELIVERRO", "DELPT", "DELFENCING", "SERVICEJR"].includes(reportData[key].workFlow)) {
+                                        await addDoc(towerRef, { data: reportData[key] });
+                                    }
+                                }
+                            }
+                        })()
+                    );
                 }
+
+                await Promise.all(promises);
                 break;
             default:
                 throw new Error("Invalid report type");
@@ -630,13 +662,30 @@ const getCollectionData = async (collectionName, startDate, endDate) => {
     return data;
 }
 
+const getTowerData = async (startDate, endDate) => {
+    // Convert "mm-dd-yyyy" to Excel's date format
+    const excelStartDate = (new Date(startDate).getTime() / (24 * 60 * 60 * 1000)) + 25569;
+    const excelEndDate = (new Date(endDate).getTime() / (24 * 60 * 60 * 1000)) + 25569 + (1 - 1 / (24 * 60 * 60));
+
+    const ref = collection(db, "tower");
+    const queryRef = query(ref, where("data.orderDate", ">=", excelStartDate), where("data.orderDate", "<=", excelEndDate));
+    const snapshot = await getDocs(queryRef);
+    const data = [];
+    snapshot.forEach((doc) => {
+        data.push(doc.data());
+    });
+    return data;
+}
+
+
+
 export const getConversionData = async (startDate, endDate) => {
     try {
         const conversionData = {
             telusData: await getCollectionData("telus", startDate, endDate),
-            podiumData: await getCollectionData("podium", startDate, endDate),
-            towerData: await getCollectionData("tower", startDate, endDate),
-            cmsData: await getCollectionData("cms", startDate, endDate)
+            podiumData: await getCollectionData("podium", startDate, endDate),            
+            cmsData: await getCollectionData("cms", startDate, endDate),
+            towerData: await getTowerData(startDate, endDate)
         };
         console.log(conversionData);
         return conversionData;

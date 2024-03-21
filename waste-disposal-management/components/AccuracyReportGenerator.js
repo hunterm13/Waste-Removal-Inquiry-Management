@@ -39,7 +39,7 @@ export default function AccuracyReportGenerator({startDate, endDate}) {
         <Container maxWidth="md" style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1rem"}}>
             <FormControl style={{width:"250px"}}>
                 <InputLabel id="select-user">Select User</InputLabel>
-                <Select label="Select User" value={users} onChange={(e) => filterUser(e.target.value)}>
+                <Select label="Select User" value={user} onChange={(e) => filterUser(e.target.value)}>
                     <MenuItem value="user1">User 1</MenuItem>
                     <MenuItem value="user2">User 2</MenuItem>
                     <MenuItem value="user3">User 3</MenuItem>

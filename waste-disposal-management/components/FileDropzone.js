@@ -19,19 +19,19 @@ const FadeAlert = styled(Alert)(({ theme }) => ({
   }));
 
 const baseStyle = {
-  flex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  padding: '20px',
-  borderWidth: 2,
-  borderRadius: 2,
-  borderColor: '#eeeeee',
-  borderStyle: 'dashed',
-  backgroundColor: '#3b3a3a',
-  color: '#bdbdbd',
-  outline: 'none',
-  transition: 'border .24s ease-in-out'
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '20px',
+    borderWidth: 2,
+    borderRadius: 2,
+    borderColor: '#eeeeee',
+    borderStyle: 'dashed',
+    backgroundColor: '#3b3a3a',
+    color: '#bdbdbd',
+    outline: 'none',
+    transition: 'border .24s ease-in-out'
 
 };
 
@@ -122,7 +122,6 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                     const filteredData = updatedData.filter(item => item.CellColor === 'FF99CC' || item.CellColor === 'CCFFFF');
                     setUploadedFileData(filteredData);
                     setFileUploaded(true);
-                    console.log(filteredData);
                 }
                 else{
                     setUploadedFileData(jsonData);
@@ -174,16 +173,15 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                 }))
             });
         }else if(formType === "telus") {
+            console.log(uploadedFileData);
             setFileData({
                 date: formattedDate,
                 ...uploadedFileData.reduce((acc, data) => {
-                    if (parseFloat(data["Call Length"]) >= 0.00277778) {
-                        const existingData = acc.find((item) => item.name === data["To Name"]);
-                        if (existingData) {
-                            existingData.leads += 1;
-                        } else {
-                            acc.push({ name: data["To Name"], leads: 1 });
-                        }
+                    const existingData = acc.find((item) => item.name === data["To Name"]);
+                    if (existingData) {
+                        existingData.leads += 1;
+                    } else {
+                        acc.push({ name: data["To Name"], leads: 1 });
                     }
                     return acc;
                 }, [])
