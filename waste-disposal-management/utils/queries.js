@@ -1,6 +1,6 @@
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "./firebaseConfig";
-import { collection, query, where, getDocs, addDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc, serverTimestamp, setDoc, Timestamp } from "firebase/firestore";
 import { deleteDoc } from "firebase/firestore";
 import { sendPasswordResetEmail, createUserWithEmailAndPassword } from "firebase/auth";
 
@@ -694,3 +694,26 @@ export const getConversionData = async (startDate, endDate) => {
         throw error;
     }
 }
+
+export const getReportsByDate = async (startDate, endDate) => {
+    try {
+        const reportsRef = collection(db, "reports");
+        const startTimestamp = Timestamp.fromDate(new Date(startDate));
+        const endTimestamp = Timestamp.fromDate(new Date(endDate));
+
+        const q = query(reportsRef, where("dateReported", ">=", startTimestamp), where("dateReported", "<=", endTimestamp));
+        const querySnapshot = await getDocs(q);
+
+        const reports = [];
+        querySnapshot.forEach((doc) => {
+            const reportData = doc.data();
+            const reportWithId = { id: doc.id, ...reportData };
+            reports.push(reportWithId);
+        });
+
+        return reports;
+    } catch (error) {
+        console.error("Error retrieving reports:", error);
+        throw error;
+    }
+};

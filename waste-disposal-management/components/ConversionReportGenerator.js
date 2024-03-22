@@ -1,6 +1,6 @@
 import { CircularProgress, Alert, AlertTitle, FormControl, InputLabel, MenuItem, Select, Typography, Table, TableHead, Paper, TableRow, TableCell, TableBody, Container, TableContainer } from '@mui/material';
 import {useState, useEffect} from 'react';
-import { getAllUserID, getConversionData, getAdminStatus, getUserFirstName, getUserLastName } from '../utils/queries';
+import { getAllUserID, getAdminStatus, getUserFirstName, getUserLastName, getReportsByDate } from '../utils/queries';
 import { styled } from '@mui/system';
 
 const FadeAlert = styled(Alert)(({ theme }) => ({
@@ -21,7 +21,7 @@ export default function ConversionReportGenerator({startDate, endDate}) {
     const [telusLeads, setTelusLeads] = useState([]);
     const [podiumLeads, setPodiumLeads] = useState([]);
     const [cmsLeads, setCmsLeads] = useState([]);
-    const [towerData, setTowerData] = useState([]);
+    const [bookedData, setBookedData] = useState([]);
     const [show, setShow] = useState(false);
     const [error, setError] = useState("");
     const [totalLeads, setTotalLeads] = useState(0);
@@ -30,7 +30,7 @@ export default function ConversionReportGenerator({startDate, endDate}) {
     useEffect(() => {
         const fetchReportData = async () => {
             try {
-                const conversion = await getConversionData("03-01-2024", "03-30-2024");
+                const conversion = await getReportsByDate("03-01-2024", "03-30-2024");
                 setReportData(conversion);
                 console.log(conversion)
                 const userIDs = await getAllUserID();
@@ -86,26 +86,23 @@ export default function ConversionReportGenerator({startDate, endDate}) {
 
     const filterUserData =  (newUser) => {        
         try{
-            const totalTelusLeads = findDataForAllDays(reportData.telusData, newUser[1]);
+            const totalTelusLeads = reportData.filter(item => item.userName === newUser[1] && item.leadChannel === "Phone" && ["Roll Off", "Portable Toilet", "Fencing", "Junk Removal"].includes(item.service)).length;
             setTelusLeads(totalTelusLeads);
 
-            const totalPodiumLeads = findDataForAllDays(reportData.podiumData, newUser[1]);
+            const totalPodiumLeads = reportData.filter(item => item.userName === newUser[1] && item.leadChannel === "Podium" && ["Roll Off", "Portable Toilet", "Fencing", "Junk Removal"].includes(item.service)).length;
             setPodiumLeads(totalPodiumLeads);
 
-            const totalCmsLeads = findDataForAllDays(reportData.cmsData, newUser[1]);
+            const totalCmsLeads = reportData.filter(item => item.userName === newUser[1] && item.leadChannel === "CMS" && ["Roll Off", "Portable Toilet", "Fencing", "Junk Removal"].includes(item.service)).length;
             setCmsLeads(totalCmsLeads);
-
-            const filteredTowerData = reportData.towerData.filter(item => item.data.name === newUser[1]);
-            setTowerData(filteredTowerData);
             
             setTotalLeads(totalTelusLeads + totalPodiumLeads + totalCmsLeads);
-            setTotalJobsBooked(filteredTowerData.length);
-            
+            setBookedData(reportData.filter(item => item.userName === newUser[1] && item.leadTag === "Booked"));
+            setTotalJobsBooked(reportData.filter(item => item.userName === newUser[1] && item.leadTag === "Booked").length);
+
         }
         catch (error) {
             console.error("Error filtering user data:", error);
         }
-
     }
 
 
@@ -164,11 +161,11 @@ export default function ConversionReportGenerator({startDate, endDate}) {
                 <TableBody>
                     <TableRow>
                         <TableCell align="right" style={{textWrap:"nowrap"}}>{user[1]}</TableCell>
-                        <TableCell align="right" style={{borderLeft:"2px solid black"}}>{towerData.filter(item => item.data.workFlow === "DELIVERRO").length}</TableCell>
-                        <TableCell align="right" style={{borderLeft:"1px solid grey"}}>{towerData.filter(item => item.data.workFlow === "SERVICEJR").length}</TableCell>
-                        <TableCell align="right" style={{borderLeft:"1px solid grey"}}>{towerData.filter(item => item.data.workFlow === "DELPT").length}</TableCell>
-                        <TableCell align="right" style={{borderLeft:"1px solid grey"}}>{towerData.filter(item => item.data.workFlow === "DELFENCING").length}</TableCell>
-                        <TableCell align="right" style={{borderLeft:"1px solid grey"}}>{towerData.length}</TableCell>
+                        <TableCell align="right" style={{borderLeft:"2px solid black"}}>{bookedData.filter(item => item.workFlow === "DELIVERRO").length}</TableCell>
+                        <TableCell align="right" style={{borderLeft:"1px solid grey"}}>{bookedData.filter(item => item.workFlow === "SERVICEJR").length}</TableCell>
+                        <TableCell align="right" style={{borderLeft:"1px solid grey"}}>{bookedData.filter(item => item.workFlow === "DELPT").length}</TableCell>
+                        <TableCell align="right" style={{borderLeft:"1px solid grey"}}>{bookedData.filter(item => item.workFlow === "DELFENCING").length}</TableCell>
+                        <TableCell align="right" style={{borderLeft:"1px solid grey"}}>{bookedData.length}</TableCell>
                         <TableCell align="right" style={{borderLeft:"2px solid black"}}>{podiumLeads}</TableCell>
                         <TableCell align="right" style={{borderLeft:"1px solid grey"}}>{cmsLeads}</TableCell>
                         <TableCell align="right" style={{borderLeft:"1px solid grey"}}>{telusLeads}</TableCell>
