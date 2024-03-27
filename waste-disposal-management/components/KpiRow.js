@@ -5,7 +5,7 @@ import KpiSingleBar from "./KpiSingleBar";
 
 export default function KpiRow({userID, startDate, endDate}) {
     const [loading, setLoading] = useState(true);
-    const [conversions, setConversions] = useState(0);
+    const [booked, setBooked] = useState(0);
     const [inquiries, setInquiries] = useState(0);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -14,7 +14,7 @@ export default function KpiRow({userID, startDate, endDate}) {
         const fetchUserKpi = async () => {
             try {
                 const response = await getUserKpi(userID,startDate,endDate);
-                setConversions(response.totalConversions);
+                setBooked(response.totalBooked);
                 setInquiries(response.totalInquiries);
                 setLoading(false);
             } catch (error) {
@@ -55,11 +55,20 @@ export default function KpiRow({userID, startDate, endDate}) {
             <TableRow key={userID}>
                 <TableCell><Typography>{firstName} {lastName}</Typography></TableCell>
                 <TableCell>
-                    {conversions && inquiries ? (
-                        <KpiSingleBar salesMade={conversions} totalInquiries={inquiries} />
+                    {booked && inquiries ? (
+                    <KpiSingleBar salesMade={booked} totalInquiries={inquiries} />
                     ) : (
-                        <Typography>Nothing To Show</Typography>
+                    <Typography>Nothing To Show</Typography>
                     )}
+                </TableCell>
+                <TableCell>
+                    <Typography>
+                    {booked && inquiries ? (
+                        ((booked / inquiries) * 100).toFixed(1)+"%"
+                        ) : (
+                        "N/A"
+                    )}
+                    </Typography>
                 </TableCell>
                 <TableCell>
                     <Button variant="contained" color="primary" size="small" href={`/userKpi/${userID}`}>View</Button>

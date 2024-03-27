@@ -1,13 +1,13 @@
-import { CircularProgress, Alert, AlertTitle, FormControl, InputLabel, MenuItem, Select, Typography, Table, TableHead, Paper, TableRow, TableCell, TableBody, Container, TableContainer } from '@mui/material';
-import {useState, useEffect} from 'react';
-import { getAllUserID, getAdminStatus, getUserFirstName, getUserLastName, getReportsByDate } from '../utils/queries';
-import { styled } from '@mui/system';
+import { CircularProgress, Alert, AlertTitle, FormControl, InputLabel, MenuItem, Select, Typography, Table, TableHead, Paper, TableRow, TableCell, TableBody, Container, TableContainer } from "@mui/material";
+import {useState, useEffect} from "react";
+import { getAllUserID, getAdminStatus, getUserFirstName, getUserLastName, getReportsByDate } from "../utils/queries";
+import { styled } from "@mui/system";
 
 const FadeAlert = styled(Alert)(({ theme }) => ({
     opacity: 0,
-    marginBottom: '1rem',
-    transition: 'opacity 0.1s ease-in-out',
-    '&.show': {
+    marginBottom: "1rem",
+    transition: "opacity 0.1s ease-in-out",
+    "&.show": {
       opacity: 1,
     },
   }));
@@ -30,9 +30,8 @@ export default function ConversionReportGenerator({startDate, endDate}) {
     useEffect(() => {
         const fetchReportData = async () => {
             try {
-                const conversion = await getReportsByDate("03-01-2024", "03-30-2024");
+                const conversion = await getReportsByDate(startDate.valueOf(), endDate.valueOf());
                 setReportData(conversion);
-                console.log(conversion)
                 const userIDs = await getAllUserID();
                 const updatedResponse = await Promise.all(userIDs.map(async user => {
                     const adminStatus = await getAdminStatus(user);
@@ -49,23 +48,26 @@ export default function ConversionReportGenerator({startDate, endDate}) {
         fetchReportData();
     }, []);
 
-    // useEffect(() => {
-    //     const fetchReportData = async () => {
-    //         try {                
-    //             const conversion = await getConversionData("03-01-2024", "03-30-2024");
-    //             setReportData(conversion);
-    //             setLoading(false);
-    //         } catch (error) {
-    //             console.error("Error fetching report data:", error);
-    //         }
-    //     };
-    //     fetchReportData();
-    // }, [startDate, endDate]);
+    useEffect(() => {
+        setLoading(true);
+        const refetchData = async () => {
+            try {
+                const newData = await getReportsByDate(startDate.valueOf(), endDate.valueOf());
+                setReportData(newData);
+                filterUserData(user,newData);
+                console.log(reportData);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching report data:", error);
+            }            
+        };
+        refetchData();
+    }, [startDate, endDate]);
 
     const updateUser = (newUser) => {
         setUser(newUser);
         filterUserData(newUser);
-    }    
+    };    
 
     function findNestedObject(data, name) {
         for (let key in data) {
@@ -74,36 +76,29 @@ export default function ConversionReportGenerator({startDate, endDate}) {
             }
         }
         return null; // Return null if no matching object is found
-    }
-    
-    function findDataForAllDays(dataArray, name) {
-        return dataArray.reduce((totalLeads, item) => {
-            const foundObject = item.data ? findNestedObject(item.data, name) : null;
-            return totalLeads + (foundObject ? foundObject.leads : 0);
-        }, 0);
-    }
-      
+    }      
 
-    const filterUserData =  (newUser) => {        
+    const filterUserData =  (newUser, newData = null) => {        
         try{
-            const totalTelusLeads = reportData.filter(item => item.userName === newUser[1] && item.leadChannel === "Phone" && ["Roll Off", "Portable Toilet", "Fencing", "Junk Removal"].includes(item.service)).length;
+            const data = newData || reportData;
+            const totalTelusLeads = data.filter(item => item.userName === newUser[1] && item.leadChannel === "Phone" && ["Roll Off", "Portable Toilet", "Fencing", "Junk Removal"].includes(item.service)).length;
             setTelusLeads(totalTelusLeads);
 
-            const totalPodiumLeads = reportData.filter(item => item.userName === newUser[1] && item.leadChannel === "Podium" && ["Roll Off", "Portable Toilet", "Fencing", "Junk Removal"].includes(item.service)).length;
+            const totalPodiumLeads = data.filter(item => item.userName === newUser[1] && item.leadChannel === "Podium" && ["Roll Off", "Portable Toilet", "Fencing", "Junk Removal"].includes(item.service)).length;
             setPodiumLeads(totalPodiumLeads);
 
-            const totalCmsLeads = reportData.filter(item => item.userName === newUser[1] && item.leadChannel === "CMS" && ["Roll Off", "Portable Toilet", "Fencing", "Junk Removal"].includes(item.service)).length;
+            const totalCmsLeads = data.filter(item => item.userName === newUser[1] && item.leadChannel === "CMS" && ["Roll Off", "Portable Toilet", "Fencing", "Junk Removal"].includes(item.service)).length;
             setCmsLeads(totalCmsLeads);
             
             setTotalLeads(totalTelusLeads + totalPodiumLeads + totalCmsLeads);
-            setBookedData(reportData.filter(item => item.userName === newUser[1] && item.leadTag === "Booked"));
-            setTotalJobsBooked(reportData.filter(item => item.userName === newUser[1] && item.leadTag === "Booked").length);
+            setBookedData(data.filter(item => item.userName === newUser[1] && item.leadTag === "Booked"));
+            setTotalJobsBooked(data.filter(item => item.userName === newUser[1] && item.leadTag === "Booked").length);
 
         }
         catch (error) {
             console.error("Error filtering user data:", error);
         }
-    }
+    };
 
 
     if (loading) {
@@ -118,7 +113,7 @@ export default function ConversionReportGenerator({startDate, endDate}) {
 
     return <>
         <Container maxWidth="md" style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1rem"}}>
-            <FadeAlert severity='error' className={show ? 'show' : ''} onClose={() => setError("")}>
+            <FadeAlert severity='error' className={show ? "show" : ""} onClose={() => setError("")}>
                 <AlertTitle>{error}</AlertTitle>
             </FadeAlert>
         </Container>
@@ -175,5 +170,5 @@ export default function ConversionReportGenerator({startDate, endDate}) {
                 </TableBody>
             </Table>
         </TableContainer>
-    </>
+    </>;
 }

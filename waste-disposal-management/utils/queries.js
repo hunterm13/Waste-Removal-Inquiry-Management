@@ -306,10 +306,21 @@ export const getUserKpi = async (userID, startDate, endDate) => {
     }
 
     const querySnapshot = await getDocs(q);
-    const totalInquiries = querySnapshot.size;
-    const totalConversions = querySnapshot.size - querySnapshot.docs.filter(doc => doc.data().leadTag === "Lost" || !doc.data().leadTag).length;
 
-    return { totalInquiries, totalConversions };
+    const filteredBooked = querySnapshot.docs.filter(doc => {
+        const service = doc.data().service;
+        const leadTag = doc.data().leadTag;
+        return (service === "Roll Off" || service === "Junk Removal" || service === "Portable Toilet" || service === "Fencing") && leadTag === "Booked";
+    });
+    const totalBooked = filteredBooked.length;
+
+    const filteredTotal = querySnapshot.docs.filter(doc => {
+        const service = doc.data().service;
+        return (service === "Roll Off" || service === "Junk Removal" || service === "Portable Toilet" || service === "Fencing");
+    });
+    const totalInquiries = filteredTotal.length;
+
+    return { totalBooked, totalInquiries };
 };
 
 export const getAllUserID = async () => {
@@ -580,7 +591,7 @@ const checkDate = async (reportType, reportDate) => {
         console.error("Error checking date: ", error);
         throw error;
     }
-}
+};
 
 // used for adding cms, telus, podium, or tower report data
 export const addNewReportData = async (reportType, reportData) => {
@@ -652,20 +663,24 @@ export const addNewReportData = async (reportType, reportData) => {
 };
 
 const getCollectionData = async (collectionName, startDate, endDate) => {
-    const ref = collection(db, collectionName); // Use collectionGroup instead of collection
-    const queryRef = query(ref, where("data.date", ">=", startDate), where("data.date", "<=", endDate));
+    const dateOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
+    const startDateFormatted = new Date(startDate).toLocaleDateString("en-US", dateOptions).replace(/\//g, "-");
+    const endDateFormatted = new Date(endDate).toLocaleDateString("en-US", dateOptions).replace(/\//g, "-");
+    
+    const ref = collection(db, collectionName);
+    const queryRef = query(ref, where("data.date", ">=", startDateFormatted), where("data.date", "<=", endDateFormatted));
     const snapshot = await getDocs(queryRef);
     const data = [];
     snapshot.forEach((doc) => {
         data.push(doc.data());
     });
     return data;
-}
+};
 
 const getTowerData = async (startDate, endDate) => {
     // Convert "mm-dd-yyyy" to Excel's date format
-    const excelStartDate = (new Date(startDate).getTime() / (24 * 60 * 60 * 1000)) + 25569;
-    const excelEndDate = (new Date(endDate).getTime() / (24 * 60 * 60 * 1000)) + 25569 + (1 - 1 / (24 * 60 * 60));
+    const excelStartDate = (startDate / (24 * 60 * 60 * 1000)) + 25569;
+    const excelEndDate = (endDate / (24 * 60 * 60 * 1000)) + 25569 + (1 - 1 / (24 * 60 * 60));
 
     const ref = collection(db, "tower");
     const queryRef = query(ref, where("data.orderDate", ">=", excelStartDate), where("data.orderDate", "<=", excelEndDate));
@@ -675,7 +690,7 @@ const getTowerData = async (startDate, endDate) => {
         data.push(doc.data());
     });
     return data;
-}
+};
 
 
 
@@ -693,7 +708,7 @@ export const getConversionData = async (startDate, endDate) => {
         console.error("Error retrieving conversion data:", error);
         throw error;
     }
-}
+};
 
 export const getReportsByDate = async (startDate, endDate) => {
     try {

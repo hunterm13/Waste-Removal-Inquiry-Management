@@ -1,50 +1,50 @@
-import { Button, Alert, AlertTitle, Box } from '@mui/material';
-import React, {useEffect, useMemo, useState} from 'react';
-import {useDropzone} from 'react-dropzone';
-import * as XLSX from 'xlsx';
-import dayjs from 'dayjs';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { addNewReportData } from '../utils/queries';
+import { Button, Alert, AlertTitle, Box, TextField } from "@mui/material";
+import React, {useEffect, useMemo, useState} from "react";
+import {useDropzone} from "react-dropzone";
+import * as XLSX from "xlsx";
+import dayjs from "dayjs";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { addNewReportData } from "../utils/queries";
 import { styled } from "@mui/system";
-import ExcelJS from 'exceljs';
+import ExcelJS from "exceljs";
 
 const FadeAlert = styled(Alert)(({ theme }) => ({
     opacity: 0,
-    marginBottom: '1rem',
-    transition: 'opacity 0.1s ease-in-out',
-    '&.show': {
+    marginBottom: "1rem",
+    transition: "opacity 0.1s ease-in-out",
+    "&.show": {
       opacity: 1,
     },
   }));
 
 const baseStyle = {
     flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '20px',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "20px",
     borderWidth: 2,
     borderRadius: 2,
-    borderColor: '#eeeeee',
-    borderStyle: 'dashed',
-    backgroundColor: '#3b3a3a',
-    color: '#bdbdbd',
-    outline: 'none',
-    transition: 'border .24s ease-in-out'
+    borderColor: "#eeeeee",
+    borderStyle: "dashed",
+    backgroundColor: "#3b3a3a",
+    color: "#bdbdbd",
+    outline: "none",
+    transition: "border .24s ease-in-out"
 
 };
 
 const focusedStyle = {
-  borderColor: '#2196f3'
+  borderColor: "#2196f3"
 };
 
 const acceptStyle = {
-  borderColor: '#00e676'
+  borderColor: "#00e676"
 };
 
 const rejectStyle = {
-  borderColor: '#ff1744'
+  borderColor: "#ff1744"
 };
 
 export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
@@ -89,24 +89,24 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
 
             const reader = new FileReader();
         
-            reader.onabort = () => console.log('file reading was aborted');
-            reader.onerror = () => console.log('file reading has failed');
+            reader.onabort = () => console.log("file reading was aborted");
+            reader.onerror = () => console.log("file reading has failed");
             reader.onload = () => {
                 // Parse the file
                 const binaryStr = reader.result;
-                const workbook = XLSX.read(binaryStr, {type:'binary', cellStyles: true});
+                const workbook = XLSX.read(binaryStr, {type:"binary", cellStyles: true});
                 let sheetName;
                 switch(formType) {
                     case "tower":
                     case "podium":
                     case "cms":
-                        sheetName = 'Sheet1'; // replace with your sheet name
+                        sheetName = "Sheet1"; // replace with your sheet name
                         break;
-                    case 'telus':
-                        sheetName = 'Calls'; // replace with your sheet name
+                    case "telus":
+                        sheetName = "Calls"; // replace with your sheet name
                         break;
                     default:
-                        console.log('Invalid formType: ' + formType);
+                        console.log("Invalid formType: " + formType);
                         return;
                 }
 
@@ -116,10 +116,10 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                     const updatedData = jsonData.map((item, index) => {
                         const cell = `A${index + 2}`;
                         const cellColor = worksheet[cell].s && worksheet[cell].s.fgColor ? worksheet[cell].s.fgColor.rgb : null;
-                        const isCancelled = cellColor === 'FF99CC' ? true : false;
+                        const isCancelled = cellColor === "FF99CC" ? true : false;
                         return { ...item, Cancelled: isCancelled, CellColor: cellColor };
                     });
-                    const filteredData = updatedData.filter(item => item.CellColor === 'FF99CC' || item.CellColor === 'CCFFFF');
+                    const filteredData = updatedData.filter(item => item.CellColor === "FF99CC" || item.CellColor === "CCFFFF");
                     setUploadedFileData(filteredData);
                     setFileUploaded(true);
                 }
@@ -139,8 +139,8 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
         isDragAccept,
         isDragReject
     } = useDropzone({accept: {
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-        'application/vnd.ms-excel': ['.xls']
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+        "application/vnd.ms-excel": [".xls"]
         },
         onDrop,
         maxFiles: 1
@@ -162,7 +162,7 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
         if(!confirmUpload) {
             return;
         }
-        const formattedDate = dayjs(reportDate).format('MM-DD-YYYY');
+        const formattedDate = dayjs(reportDate).format("MM-DD-YYYY");
         setFileData({});
         if(formType === "cms") {
             setFileData({
@@ -190,19 +190,20 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
             setFileData({
                 date: formattedDate,
                 ...uploadedFileData.slice(1).map(data => ({
-                    name: data['Podium Led board'],
-                    leads: data['__EMPTY_1']
+                    name: data["Podium Led board"],
+                    leads: data["__EMPTY_1"]
                 }))
             });
         }else if(formType === "tower") {
             setFileData({
                 date: formattedDate,
                 ...uploadedFileData.map(data => ({
-                    cancelled: data['Cancelled'],
-                    siteName: data['Site Name'],
-                    workFlow: data['Workflow'],
-                    orderDate: data['Order Date'],
-                    name: data['Order Taken By']
+                    cancelled: data["Cancelled"],
+                    siteName: data["Site Name"],
+                    workFlow: data["Workflow"],
+                    orderDate: data["Order Date"],
+                    name: data["Order Taken By"],
+                    region: data["Region"],
                 }))
             });
         }else{
@@ -222,7 +223,7 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
 
     return <>
         <div className="container">
-            <FadeAlert severity='error' className={show ? 'show' : ''} onClose={() => setError("")}>
+            <FadeAlert severity='error' className={show ? "show" : ""} onClose={() => setError("")}>
                 <AlertTitle>{error}</AlertTitle>
             </FadeAlert>
             <div {...getRootProps({style})}>
@@ -239,16 +240,17 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                 alignItems="flex-start" 
                 width="auto"
             >
+                {formType != "tower" && 
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
-                        label="Report Date"
-                        value={reportDate}
-                        onChange={(newValue) => setReportDate(newValue)}
-                        renderInput={(params) => <TextField {...params} />}
+                    label="Report Date"
+                    value={reportDate}
+                    onChange={(newValue) => setReportDate(newValue)}
+                    renderInput={(params) => <TextField {...params} />}
                     />
-                </LocalizationProvider>
-                <Button disabled={!fileUploaded || reportDate === null} style={{marginTop:"1rem"}} onClick={processFile} variant="contained">Upload</Button>
+                </LocalizationProvider>}
+                <Button disabled={!fileUploaded || (reportDate === null && formType != "tower")} style={{marginTop:"1rem"}} onClick={processFile} variant="contained">Upload</Button>
             </Box>
         </div>
-    </>
+    </>;
 }
