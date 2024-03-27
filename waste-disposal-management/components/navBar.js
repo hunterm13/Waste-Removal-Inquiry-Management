@@ -118,6 +118,14 @@ const Navbar = () => {
                             }}>KPI Summary</Button>
                         </ListItem>
                         <ListItem sx={{padding:"0 16px 0 0"}}>
+                            <Button variant="text" component={Link} href="/conversionReport" sx={{
+                                color: "white",
+                                "&:hover": {
+                                    color: "primary.main",
+                                },
+                            }}>Conversion Tool</Button>
+                        </ListItem>
+                        <ListItem sx={{padding:"0 16px 0 0"}}>
                             <Button variant="text" component={Link} href="/allReports" sx={{
                                 color: "white",
                                 "&:hover": {

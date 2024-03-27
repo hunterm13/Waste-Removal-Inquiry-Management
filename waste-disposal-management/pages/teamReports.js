@@ -18,7 +18,7 @@ export default function TeamReports() {
     const [startDate, setStartDate] = useState(dayjs().startOf("week"));
     const [endDate, setEndDate] = useState(dayjs());
     const [customDate, setCustomDate] = useState(false);
-    const [dateRangeType, setDateRangeType] = useState("week");
+    const [dateRangeType, setDateRangeType] = useState("Week");
     const [endDateIsCurrent, setEndDateIsCurrent] = useState(true);
 
     useEffect(() => {
@@ -143,7 +143,7 @@ export default function TeamReports() {
                         <Typography variant="h6" component="h2" align="center">
                             Showing data from {startDate.format("MM/DD/YYYY")} to {endDate.format("MM/DD/YYYY")}
                         </Typography>
-                        <Button variant="contained" disabled={endDateIsCurrent}  onClick={dateForward}><KeyboardArrowRightIcon />{dateRangeType}</Button>
+                        <Button variant="contained" disabled={endDateIsCurrent}  onClick={dateForward}>{dateRangeType}<KeyboardArrowRightIcon /></Button>
                     </Container>
                     <Container maxWidth="sm" style={{display:"flex", justifyContent:"space-around", marginTop:"1rem"}}>
                         <Button variant="contained" onClick={ytd}>By Year</Button>

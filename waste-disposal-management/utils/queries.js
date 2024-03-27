@@ -1,6 +1,6 @@
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "./firebaseConfig";
-import { collection, query, where, getDocs, addDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc, serverTimestamp, setDoc, Timestamp } from "firebase/firestore";
 import { deleteDoc } from "firebase/firestore";
 import { sendPasswordResetEmail, createUserWithEmailAndPassword } from "firebase/auth";
 
@@ -307,10 +307,21 @@ export const getUserKpi = async (userID, startDate, endDate) => {
     }
 
     const querySnapshot = await getDocs(q);
-    const totalInquiries = querySnapshot.size;
-    const totalConversions = querySnapshot.size - querySnapshot.docs.filter(doc => doc.data().leadTag === "Lost" || !doc.data().leadTag).length;
 
-    return { totalInquiries, totalConversions };
+    const filteredBooked = querySnapshot.docs.filter(doc => {
+        const service = doc.data().service;
+        const leadTag = doc.data().leadTag;
+        return (service === "Roll Off" || service === "Junk Removal" || service === "Portable Toilet" || service === "Fencing") && leadTag === "Booked";
+    });
+    const totalBooked = filteredBooked.length;
+
+    const filteredTotal = querySnapshot.docs.filter(doc => {
+        const service = doc.data().service;
+        return (service === "Roll Off" || service === "Junk Removal" || service === "Portable Toilet" || service === "Fencing");
+    });
+    const totalInquiries = filteredTotal.length;
+
+    return { totalBooked, totalInquiries };
 };
 
 export const getAllUserID = async () => {
@@ -566,6 +577,159 @@ export const fixLeadChannels = async () => {
         });
     } catch (error) {
         console.error("Error fixing lead channel:", error);
+        throw error;
+    }
+};
+
+const checkDate = async (reportType, reportDate) => {
+    try {
+        const reportsRef = collection(db, reportType);
+        const q = query(reportsRef, where("data.date", "==", reportDate));
+        const querySnapshot = await getDocs(q);
+        const exists = !querySnapshot.empty;
+        return exists;
+    } catch (error) {
+        console.error("Error checking date: ", error);
+        throw error;
+    }
+};
+
+// used for adding cms, telus, podium, or tower report data
+export const addNewReportData = async (reportType, reportData) => {
+    try{
+        if(reportData.length === 0) {
+            throw new Error("No data to upload");
+        }
+        if(reportType != "tower") {
+            checkDate(reportType, reportData.date);
+        }
+        switch(reportType) {
+            case "cms":
+                const cmsRef = doc(collection(db, "cms"));
+                await setDoc(cmsRef, { data: reportData });
+                break;
+            case "telus":
+                const telusRef = doc(collection(db, "telus"));
+                await setDoc(telusRef, { data: reportData });
+                break;
+            case "podium":
+                const podiumRef = doc(collection(db, "podium"));
+                await setDoc(podiumRef, { data: reportData });
+                break;
+            case "tower":
+                const towerRef = collection(db, "tower");
+                delete reportData.date;
+                let promises = [];
+                for (const key in reportData) {
+                    promises.push(
+                        (async () => {
+                            const towerQuery = query(
+                                towerRef,
+                                where("data.orderDate", "==", reportData[key].orderDate),
+                                where("data.name", "==", reportData[key].name),
+                                where("data.workFlow", "==", reportData[key].workFlow),
+                                where("data.siteName", "==", reportData[key].siteName)
+                            );
+
+                            const towerSnapshot = await getDocs(towerQuery);
+
+                            if (!towerSnapshot.empty) {
+                                const towerData = towerSnapshot.docs[0].data();
+                                if (!towerData.data.cancelled && reportData[key].cancelled) {
+                                    console.log("Cancelled order found");
+                                    await setDoc(towerSnapshot.docs[0].ref, { data: { ...towerData.data, cancelled: true } }, { merge: true });
+                                }
+                            } else {
+                                // Check for duplicates before adding a new document
+                                const duplicateQuery = query(towerRef, where("data", "==", reportData[key]));
+                                const duplicateSnapshot = await getDocs(duplicateQuery);
+                                if (duplicateSnapshot.empty) {
+                                    if (["DELIVERRO", "DELPT", "DELFENCING", "SERVICEJR"].includes(reportData[key].workFlow)) {
+                                        await addDoc(towerRef, { data: reportData[key] });
+                                    }
+                                }
+                            }
+                        })()
+                    );
+                }
+
+                await Promise.all(promises);
+                break;
+            default:
+                throw new Error("Invalid report type");
+        }
+    } catch (error) {
+        throw error;
+    }
+};
+
+const getCollectionData = async (collectionName, startDate, endDate) => {
+    const dateOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
+    const startDateFormatted = new Date(startDate).toLocaleDateString("en-US", dateOptions).replace(/\//g, "-");
+    const endDateFormatted = new Date(endDate).toLocaleDateString("en-US", dateOptions).replace(/\//g, "-");
+    
+    const ref = collection(db, collectionName);
+    const queryRef = query(ref, where("data.date", ">=", startDateFormatted), where("data.date", "<=", endDateFormatted));
+    const snapshot = await getDocs(queryRef);
+    const data = [];
+    snapshot.forEach((doc) => {
+        data.push(doc.data());
+    });
+    return data;
+};
+
+const getTowerData = async (startDate, endDate) => {
+    // Convert "mm-dd-yyyy" to Excel's date format
+    const excelStartDate = (startDate / (24 * 60 * 60 * 1000)) + 25569;
+    const excelEndDate = (endDate / (24 * 60 * 60 * 1000)) + 25569 + (1 - 1 / (24 * 60 * 60));
+
+    const ref = collection(db, "tower");
+    const queryRef = query(ref, where("data.orderDate", ">=", excelStartDate), where("data.orderDate", "<=", excelEndDate));
+    const snapshot = await getDocs(queryRef);
+    const data = [];
+    snapshot.forEach((doc) => {
+        data.push(doc.data());
+    });
+    return data;
+};
+
+
+
+export const getConversionData = async (startDate, endDate) => {
+    try {
+        const conversionData = {
+            telusData: await getCollectionData("telus", startDate, endDate),
+            podiumData: await getCollectionData("podium", startDate, endDate),            
+            cmsData: await getCollectionData("cms", startDate, endDate),
+            towerData: await getTowerData(startDate, endDate)
+        };
+        console.log(conversionData);
+        return conversionData;
+    } catch (error) {
+        console.error("Error retrieving conversion data:", error);
+        throw error;
+    }
+};
+
+export const getReportsByDate = async (startDate, endDate) => {
+    try {
+        const reportsRef = collection(db, "reports");
+        const startTimestamp = Timestamp.fromDate(new Date(startDate));
+        const endTimestamp = Timestamp.fromDate(new Date(endDate));
+
+        const q = query(reportsRef, where("dateReported", ">=", startTimestamp), where("dateReported", "<=", endTimestamp));
+        const querySnapshot = await getDocs(q);
+
+        const reports = [];
+        querySnapshot.forEach((doc) => {
+            const reportData = doc.data();
+            const reportWithId = { id: doc.id, ...reportData };
+            reports.push(reportWithId);
+        });
+
+        return reports;
+    } catch (error) {
+        console.error("Error retrieving reports:", error);
         throw error;
     }
 };

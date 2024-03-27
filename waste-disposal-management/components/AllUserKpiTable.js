@@ -11,6 +11,7 @@ export default function AllUserKpiTable ({startDate, endDate}) {
         const fetchUserIDs = async () => {
             try {
                 const response = await getAllUserID();
+
                 setUserIDs(response);
                 setLoading(false);
             } catch (error) {
@@ -36,7 +37,8 @@ export default function AllUserKpiTable ({startDate, endDate}) {
                 <TableHead sx={{backgroundColor: "#333333"}}>
                     <TableRow>
                         <TableCell style={{width:"15%"}}>Name</TableCell>
-                        <TableCell style={{width:"75%"}}>Conversions</TableCell>
+                        <TableCell style={{width:"65%"}}>Conversions</TableCell>
+                        <TableCell style={{width:"10%"}}>Conversion %</TableCell>
                         <TableCell style={{width:"10%"}}></TableCell>
                     </TableRow>
                 </TableHead>
