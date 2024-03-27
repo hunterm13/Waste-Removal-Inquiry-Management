@@ -119,6 +119,7 @@ export const newReport = async (reportData, newReportType) => {
         }
     } else if (newReportType === "Swap" || newReportType === "Removal" || newReportType === "Other"){
         try {
+            console.log(reportData)
             const newReportRef = collection(db, "reports");
             if (!reportData.notes) {
                 throw new Error("Required fields are missing");
@@ -128,7 +129,7 @@ export const newReport = async (reportData, newReportType) => {
             }
 
             const newReportData = {
-                service: reportData.reportType,
+                service: newReportType,
                 notes: reportData.notes,
                 userID: reportData.userID,
                 siteNumber: reportData.siteNumber,
@@ -150,7 +151,7 @@ export const newReport = async (reportData, newReportType) => {
             }
 
             const newReportData = {
-                service: reportData.reportType,
+                service: newReportType,
                 notes: reportData.notes,
                 userID: reportData.userID,
                 dateReported: serverTimestamp(),
