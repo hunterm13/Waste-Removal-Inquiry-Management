@@ -154,103 +154,116 @@ export default function ConversionReport() {
             </Container>
         );
     }
-    return <>
-        {success && (
+    if (!isAdmin) {
+        return (
             <Container maxWidth="xl">
-                <Alert severity="success" onClose={() => setSuccess(false)}>
-                    <AlertTitle>Upload Success</AlertTitle>
-                </Alert>
+                <Typography variant="h2" component="h1" align="center">
+                    You are not authorized to view this page.
+                </Typography>
+                <Typography variant="h5" component="h1" align="center">
+                    If you believe this is an error, please contact your system administrator.
+                </Typography>
             </Container>
-        )}
-        <Container maxWidth="md">
-            <Typography variant="h2" component="h1" align="center" style={{marginBottom:"2rem"}}>
-                Reporting Tools
-            </Typography>
-            
-            {!uploadingFile && !creatingAccuracyReport && !creatingConversionReport && (
-            <Container maxWidth="sm" style={{display:"flex", justifyContent: "space-around", marginTop:"3rem"}}>
-                <Button variant="contained" onClick={() => setUploadingFile(true)}>Upload File</Button>
-                <Button variant="contained" onClick={() => setCreatingConversionReport(true)}>View Conversion</Button>
-                <Button variant="contained" onClick={() => setCreatingAccuracyReport(true)}>View Accuracy</Button>
-            </Container>
+        );    
+    } else {
+        return <>
+            {success && (
+                <Container maxWidth="xl">
+                    <Alert severity="success" onClose={() => setSuccess(false)}>
+                        <AlertTitle>Upload Success</AlertTitle>
+                    </Alert>
+                </Container>
             )}
-        </Container>
-        {uploadingFile && (
-             <Container maxWidth="lg" style={{display:"flex", flexDirection:"column", justifyContent:"space-between"}}>
-                <Container style={{display:"flex", justifyContent:"space-between", alignItems: "center", marginBottom:"2rem", padding:"0"}}>
-                    <FormControl sx={{width:"fit-content", minWidth:"13%"}}>
-                        <InputLabel id="report-type">Report Type</InputLabel>
-                        <Select
-                            label={"Report Type"}
-                            labelId="report-type"
-                            value={formUploadingType}
-                            onChange={(e) => setformUploadingType(e.target.value)}
-                        >
-                            <MenuItem value="Please Select a Report Type" disabled>Please Select a Report Type</MenuItem>
-                            <MenuItem value="telus">Telus</MenuItem>
-                            <MenuItem value="podium">Podium</MenuItem>
-                            <MenuItem value="tower">Tower</MenuItem>
-                            <MenuItem value="cms">CMS</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <Button variant="contained" style={{height:"fit-content"}}color="secondary" onClick={() => {setUploadingFile(false);}}>Cancel</Button>
+            <Container maxWidth="md">
+                <Typography variant="h2" component="h1" align="center" style={{marginBottom:"2rem"}}>
+                    Reporting Tools
+                </Typography>
+                
+                {!uploadingFile && !creatingAccuracyReport && !creatingConversionReport && (
+                <Container maxWidth="sm" style={{display:"flex", justifyContent: "space-around", marginTop:"3rem"}}>
+                    <Button variant="contained" onClick={() => setUploadingFile(true)}>Upload File</Button>
+                    <Button variant="contained" onClick={() => setCreatingConversionReport(true)}>View Conversion</Button>
+                    <Button variant="contained" onClick={() => setCreatingAccuracyReport(true)}>View Accuracy</Button>
                 </Container>
-                {formUploadingType !== "Please Select a Report Type" && <FileDropzone formType={formUploadingType} setSuccess={setSuccess} setUploadingFile={setUploadingFile}/>}
+                )}
             </Container>
-        )}
-        {creatingAccuracyReport && (
-            <Container maxWidth="xl">
-                <AccuracyReportGenerator startDate={startDate} endDate={endDate} />
-                <Container>
-                    <Button variant="contained" color="secondary" onClick={() => {
-                        setUploadingFile(false);
-                        setCreatingAccuracyReport(false);
-                    }}>Cancel</Button>
-                </Container>
-            </Container>
-        )}
-        {creatingConversionReport && (
-            <Container maxWidth="xl">
-                <ConversionReportGenerator startDate={startDate} endDate={endDate}/>
-                <Container>
-                    <Button variant="contained" color="secondary" onClick={() => {
-                        setUploadingFile(false);
-                        setCreatingConversionReport(false);
-                    }}>Cancel</Button>
-                </Container>
-            </Container>
-        )}
-        {creatingAccuracyReport || creatingConversionReport ? 
-        <>
-        <Container maxWidth="md" style={{display:"flex", justifyContent:"space-around"}}>
-                        <Button variant="contained" onClick={dateBack}><KeyboardArrowLeftIcon />{dateRangeType}</Button>
-                        <Typography variant="h6" component="h2" align="center">
-                            Showing data from {startDate.format("MM/DD/YYYY")} to {endDate.format("MM/DD/YYYY")}
-                        </Typography>
-                        <Button variant="contained" disabled={endDateIsCurrent}  onClick={dateForward}>{dateRangeType}<KeyboardArrowRightIcon /></Button>
+            {uploadingFile && (
+                <Container maxWidth="lg" style={{display:"flex", flexDirection:"column", justifyContent:"space-between"}}>
+                    <Container style={{display:"flex", justifyContent:"space-between", alignItems: "center", marginBottom:"2rem", padding:"0"}}>
+                        <FormControl sx={{width:"fit-content", minWidth:"13%"}}>
+                            <InputLabel id="report-type">Report Type</InputLabel>
+                            <Select
+                                label={"Report Type"}
+                                labelId="report-type"
+                                value={formUploadingType}
+                                onChange={(e) => setformUploadingType(e.target.value)}
+                            >
+                                <MenuItem value="Please Select a Report Type" disabled>Please Select a Report Type</MenuItem>
+                                <MenuItem value="telus">Telus</MenuItem>
+                                <MenuItem value="podium">Podium</MenuItem>
+                                <MenuItem value="tower">Tower</MenuItem>
+                                <MenuItem value="cms">CMS</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <Button variant="contained" style={{height:"fit-content"}}color="secondary" onClick={() => {setUploadingFile(false);}}>Cancel</Button>
                     </Container>
-                    <Container maxWidth="sm" style={{display:"flex", justifyContent:"space-around", marginTop:"1rem"}}>
-                        <Button variant="contained" onClick={ytd}>By Year</Button>
-                        <Button variant="contained" onClick={mtd}>BY Month</Button>                        
-                        <Button variant="contained" onClick={wtd}>By Week</Button>
-                        <Button variant="contained" onClick={dtd}>By Day</Button>
+                    {formUploadingType !== "Please Select a Report Type" && <FileDropzone formType={formUploadingType} setSuccess={setSuccess} setUploadingFile={setUploadingFile}/>}
+                </Container>
+            )}
+            {creatingAccuracyReport && (
+                <Container maxWidth="xl">
+                    <AccuracyReportGenerator startDate={startDate} endDate={endDate} />
+                    <Container>
+                        <Button variant="contained" color="secondary" onClick={() => {
+                            setUploadingFile(false);
+                            setCreatingAccuracyReport(false);
+                        }}>Cancel</Button>
                     </Container>
-                    {!customDate ? <Container maxWidth="sm" style={{display:"flex", justifyContent:"space-around", marginTop:"1rem", marginBottom:"5rem"}}>
-                        <Button variant="contained" onClick={() => setCustomDate(true)}>Custom Date Range</Button>
-                    </Container> : null }
-                    {customDate ? <><Container maxWidth="sm" style={{display:"flex", justifyContent:"space-around", marginTop:"1rem"}}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker disableFuture value={startDate} maxDate={endDate} onChange={date => setStartDate(date)} /> 
-                            <DatePicker disableFuture value={endDate} minDate={startDate} onChange={date => setEndDate(date)} />
-                        </LocalizationProvider>
-                    </Container>                    
-                    <Container maxWidth="sm" style={{display:"flex", justifyContent:"space-around", marginBottom:"2rem"}}>
-                        <Typography variant="h6" component="h2" align="center">
-                            Start Date
-                        </Typography>
-                        <Typography variant="h6" component="h2" align="center">
-                            End Date
-                        </Typography>
-                    </Container>    </>: null}</> : null}
-    </>;
+                </Container>
+            )}
+            {creatingConversionReport && (
+                <Container maxWidth="xl">
+                    <ConversionReportGenerator startDate={startDate} endDate={endDate}/>
+                    <Container>
+                        <Button variant="contained" color="secondary" onClick={() => {
+                            setUploadingFile(false);
+                            setCreatingConversionReport(false);
+                        }}>Cancel</Button>
+                    </Container>
+                </Container>
+            )}
+            {creatingAccuracyReport || creatingConversionReport ? 
+            <>
+            <Container maxWidth="md" style={{display:"flex", justifyContent:"space-around"}}>
+                            <Button variant="contained" onClick={dateBack}><KeyboardArrowLeftIcon />{dateRangeType}</Button>
+                            <Typography variant="h6" component="h2" align="center">
+                                Showing data from {startDate.format("MM/DD/YYYY")} to {endDate.format("MM/DD/YYYY")}
+                            </Typography>
+                            <Button variant="contained" disabled={endDateIsCurrent}  onClick={dateForward}>{dateRangeType}<KeyboardArrowRightIcon /></Button>
+                        </Container>
+                        <Container maxWidth="sm" style={{display:"flex", justifyContent:"space-around", marginTop:"1rem"}}>
+                            <Button variant="contained" onClick={ytd}>By Year</Button>
+                            <Button variant="contained" onClick={mtd}>BY Month</Button>                        
+                            <Button variant="contained" onClick={wtd}>By Week</Button>
+                            <Button variant="contained" onClick={dtd}>By Day</Button>
+                        </Container>
+                        {!customDate ? <Container maxWidth="sm" style={{display:"flex", justifyContent:"space-around", marginTop:"1rem", marginBottom:"5rem"}}>
+                            <Button variant="contained" onClick={() => setCustomDate(true)}>Custom Date Range</Button>
+                        </Container> : null }
+                        {customDate ? <><Container maxWidth="sm" style={{display:"flex", justifyContent:"space-around", marginTop:"1rem"}}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker disableFuture value={startDate} maxDate={endDate} onChange={date => setStartDate(date)} /> 
+                                <DatePicker disableFuture value={endDate} minDate={startDate} onChange={date => setEndDate(date)} />
+                            </LocalizationProvider>
+                        </Container>                    
+                        <Container maxWidth="sm" style={{display:"flex", justifyContent:"space-around", marginBottom:"2rem"}}>
+                            <Typography variant="h6" component="h2" align="center">
+                                Start Date
+                            </Typography>
+                            <Typography variant="h6" component="h2" align="center">
+                                End Date
+                            </Typography>
+                        </Container>    </>: null}</> : null}
+        </>;
+    }
 };
