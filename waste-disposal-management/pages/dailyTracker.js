@@ -18,19 +18,13 @@ export default function DailyTracker() {
         today.setHours(0, 0, 0, 0);
         const q = query(collection(db, "reports"), orderBy("dateReported"), where("dateReported", ">=", today));
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            let reports = [];
+            let newReports = [];
             snapshot.forEach((doc) => {
-                reports.push({ id: doc.id, ...doc.data() });
+                newReports.push({ id: doc.id, ...doc.data() });
             });
-            setReports(reports);
-            setPieReportData([
-                [reports.filter(report => report.service === "Junk Removal").length, "Junk Removal"],
-                [reports.filter(report => report.service === "Roll Off").length, "Roll Off"],
-                [reports.filter(report => report.service === "Portable Toilet").length, "Portable Toilet"],
-                [reports.filter(report => report.service === "Fencing").length, "Fencing"]
-            ]);
+            getUsers(newReports);
         });
-        const getUsers = async () => {
+        const getUsers = async (newReports) => {
             const response = await getAllUserID();
             const updatedResponse = await Promise.all(response.map(async user => {
                 const adminStatus = await getAdminStatus(user);
@@ -40,10 +34,19 @@ export default function DailyTracker() {
                     return [user, `${firstName} ${lastName}`];
                 }
             }));
+            const filteredReports = (newReports.filter(report => updatedResponse.map(user => user ? user[0] : null).includes(report.userID)));
+            setReports(filteredReports);
             setUsers(updatedResponse.filter(user => user !== undefined));
+            setPieReportData([
+                [filteredReports.filter(report => report.service === "Junk Removal" && report.leadTag === "Booked").length, "Junk Removal"],
+                [filteredReports.filter(report => report.service === "Roll Off" && report.leadTag === "Booked").length, "Roll Off"],
+                [filteredReports.filter(report => report.service === "Portable Toilet" && report.leadTag === "Booked").length, "Portable Toilet"],
+                [filteredReports.filter(report => report.service === "Fencing" && report.leadTag === "Booked").length, "Fencing"],
+                [filteredReports.filter(report => report.leadTag === "Lost").length, "Lost"],
+                [filteredReports.filter(report => report.leadTag === "Follow Up").length, "Follow Up"],
+            ]);
             setLoading(false);
         };
-        getUsers();
 
         // Clean up the listener when the component unmounts
         return () => unsubscribe();
@@ -87,7 +90,7 @@ export default function DailyTracker() {
                             Today&apos;s  Bookings
                         </Typography>
                         <Typography variant="h4" component="h2" align="center">
-                        {reports.filter(report => report.service === "Junk Removal" || report.service === "Portable Toilet" || report.service === "Roll Off" || report.service === "Fencing").length} reports today
+                        {reports.filter(report => report.service === "Junk Removal" || report.service === "Portable Toilet" || report.service === "Roll Off" || report.service === "Fencing").length} Reports Today<br></br>{reports.filter(report => report.leadTag === "Booked").length} Bookings
                         </Typography>   
                         <Typography align="center">
                             <KpiPieChart values={pieReportData}/>
