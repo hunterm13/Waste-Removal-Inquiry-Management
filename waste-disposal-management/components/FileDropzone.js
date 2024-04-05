@@ -66,6 +66,7 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
             const uploadReportData = async () => {
                 try{
                     await addNewReportData(formType, fileData);
+                    console.log(fileData);
                     setFileData({});
                     setSuccess(true);
                     setUploadingFile(false);
@@ -98,12 +99,13 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                 let sheetName;
                 switch(formType) {
                     case "tower":
-                    case "podium":
-                    case "cms":
                         sheetName = "Sheet1"; // replace with your sheet name
                         break;
                     case "telus":
                         sheetName = "Calls"; // replace with your sheet name
+                        break;
+                    case "podiumCms":
+                        sheetName = "Leaderboard-310-DUMP Calgary-Em"
                         break;
                     default:
                         console.log("Invalid formType: " + formType);
@@ -125,6 +127,7 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                 }
                 else{
                     setUploadedFileData(jsonData);
+                    console.log(jsonData);
                     setFileUploaded(true);
                 }                
             };
@@ -164,13 +167,21 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
         }
         const formattedDate = dayjs(reportDate).format("MM-DD-YYYY");
         setFileData({});
-        if(formType === "cms") {
+        if(formType === "podiumCms") {
+            const cmsData = uploadedFileData.slice(1).map(data => ({
+                name: data["Name"],
+                leads: data[" CMS"]
+            })).filter(data => data.leads !== 0);
+        
+            const podiumData = uploadedFileData.slice(1).map(data => ({
+                name: data["Name"],
+                leads: data["POD"]
+            })).filter(data => data.leads !== 0);
+        
             setFileData({
                 date: formattedDate,
-                ...uploadedFileData.slice(1).map(data => ({
-                    name: data["CMS Led board"],
-                    leads: data["__EMPTY_1"]
-                }))
+                cmsData,
+                podiumData
             });
         }else if(formType === "telus") {
             console.log(uploadedFileData);
@@ -185,14 +196,6 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                     }
                     return acc;
                 }, [])
-            });
-        }else if(formType === "podium") {
-            setFileData({
-                date: formattedDate,
-                ...uploadedFileData.slice(1).map(data => ({
-                    name: data["Podium Led board"],
-                    leads: data["__EMPTY_1"]
-                }))
             });
         }else if(formType === "tower") {
             setFileData({

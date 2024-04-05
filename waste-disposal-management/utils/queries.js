@@ -583,6 +583,21 @@ export const fixLeadChannels = async () => {
 
 const checkDate = async (reportType, reportDate) => {
     try {
+        if(reportType === "podiumCms"){
+            const cmsRef = collection(db, "cms");
+            const podiumRef = collection(db, "podium");
+            const cmsQuery = query(cmsRef, where("data.date", "==", reportDate));
+            const podiumQuery = query(podiumRef, where("data.date", "==", reportDate));
+            const cmsSnapshot = await getDocs(cmsQuery);
+            const podiumSnapshot = await getDocs(podiumQuery);
+            const cmsExists = !cmsSnapshot.empty;
+            const podiumExists = !podiumSnapshot.empty;
+            if (cmsExists || podiumExists) {
+                return true;
+            } else {
+                return false;
+            }
+        }
         const reportsRef = collection(db, reportType);
         const q = query(reportsRef, where("data.date", "==", reportDate));
         const querySnapshot = await getDocs(q);
@@ -601,20 +616,35 @@ export const addNewReportData = async (reportType, reportData) => {
             throw new Error("No data to upload");
         }
         if(reportType != "tower") {
-            checkDate(reportType, reportData.date);
+            if(await checkDate(reportType, reportData.date)) {
+                throw new Error("Data already exists for this date");
+            }
         }
         switch(reportType) {
-            case "cms":
+            case "podiumCms":
                 const cmsRef = doc(collection(db, "cms"));
-                await setDoc(cmsRef, { data: reportData });
+                const podiumRef = doc(collection(db, "podium"));
+                await setDoc(cmsRef, { 
+                    data: Object.assign({}, ...reportData.cmsData.map((item, index) => ({
+                        [index]: {
+                            name: item.name,
+                            leads: item.leads
+                        }
+                    })), { date: reportData.date })
+                });
+                await setDoc(podiumRef, { 
+                    data: Object.assign({}, ...reportData.podiumData.map((item, index) => ({
+                        [index]: {
+                            name: item.name,
+                            leads: item.leads
+                        }
+                    })), { date: reportData.date })
+                });
+                                
                 break;
             case "telus":
                 const telusRef = doc(collection(db, "telus"));
                 await setDoc(telusRef, { data: reportData });
-                break;
-            case "podium":
-                const podiumRef = doc(collection(db, "podium"));
-                await setDoc(podiumRef, { data: reportData });
                 break;
             case "tower":
                 const towerRef = collection(db, "tower");
