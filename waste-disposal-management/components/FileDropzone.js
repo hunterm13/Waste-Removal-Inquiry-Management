@@ -105,7 +105,7 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                         sheetName = "Calls"; // replace with your sheet name
                         break;
                     case "podiumCms":
-                        sheetName = "Leaderboard-310-DUMP Calgary-Em"
+                        sheetName = "Leaderboard-310-DUMP Calgary-Em";
                         break;
                     default:
                         console.log("Invalid formType: " + formType);

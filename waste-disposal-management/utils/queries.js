@@ -17,7 +17,6 @@ export const getUserFirstName = async (userId) => {
             throw new Error("User not found");
         }
     } catch (error) {
-        console.error("Error retrieving user:", error);
         throw error;
     }
 };
@@ -37,7 +36,6 @@ export const getReportsByUserId = async (userId) => {
 
         return reports;
     } catch (error) {
-        console.error("Error retrieving reports:", error);
         throw error;
     }
 };
@@ -56,7 +54,6 @@ export const fetchUsers = async () => {
 
         return users;
     } catch (error) {
-        console.error("Error retrieving users:", error);
         throw error;
     }
 };
@@ -74,7 +71,6 @@ export const getAdminStatus = async (userId) => {
             throw new Error("User not found");
         }
     } catch (error) {
-        console.error("Error retrieving user:", error);
         throw error;
     }
 };
@@ -119,7 +115,6 @@ export const newReport = async (reportData, newReportType) => {
         }
     } else if (newReportType === "Swap" || newReportType === "Removal" || newReportType === "Other"){
         try {
-            console.log(reportData)
             const newReportRef = collection(db, "reports");
             if (!reportData.notes) {
                 throw new Error("Required fields are missing");
@@ -335,7 +330,6 @@ export const getAllUserID = async () => {
 
         return users;
     } catch (error) {
-        console.error("Error retrieving users:", error);
         throw error;
     }
 };
@@ -353,7 +347,6 @@ export const getUserLastName = async (userId) => {
             throw new Error("User not found");
         }
     } catch (error) {
-        console.error("Error retrieving user:", error);
         throw error;
     }
 };
@@ -412,7 +405,6 @@ export const getActiveStatus = async (userId) => {
             throw new Error("User not found");
         }
     } catch (error) {
-        console.error("Error retrieving user:", error);
         throw error;
     }
 };
@@ -429,7 +421,6 @@ export const getUserDetails = async (userId) => {
             throw new Error("User not found");
         }
     } catch (error) {
-        console.error("Error retrieving user:", error);
         throw error;
     }
 };
@@ -465,7 +456,6 @@ export const getAllReports = async () => {
         });
         return reports;
     } catch (error) {
-        console.error("Error retrieving reports:", error);
         throw error;
     }
 };
@@ -485,9 +475,7 @@ export const updateReportsWithUserName = async () => {
         await setDoc(reportRef, { userName }, { merge: true });
       }
     }
-    console.log("Reports updated with userName");
   } catch (error) {
-    console.error("Error updating reports with userName:", error);
     throw error;
   }
 };
@@ -502,9 +490,7 @@ export const updateReportsWithService = async () => {
                 await setDoc(reportRef, { service: report.reportType }, { merge: true });
             }
         }
-        console.log("Reports updated with service");
     } catch (error) {
-        console.error("Error updating reports with service:", error);
         throw error;
     }
 };
@@ -530,7 +516,6 @@ export const fixHowHeard = async () => {
             }
         });
     } catch (error) {
-        console.error("Error fixing report howHear:", error);
         throw error;
     }
 };
@@ -548,7 +533,6 @@ export const fixPhoneNumbers = async () => {
             }
         });
     } catch (error) {
-        console.error("Error fixing phone numbers:", error);
         throw error;
     }
 };
@@ -559,7 +543,6 @@ export const listAllSiteNumbers = async () => {
         const siteNumbers = reports.map(report => report.siteNumber);
         return siteNumbers;
     } catch (error) {
-        console.error("Error listing all site numbers:", error);
         throw error;
     }
 };
@@ -576,7 +559,6 @@ export const fixLeadChannels = async () => {
             }
         });
     } catch (error) {
-        console.error("Error fixing lead channel:", error);
         throw error;
     }
 };
@@ -604,7 +586,6 @@ const checkDate = async (reportType, reportDate) => {
         const exists = !querySnapshot.empty;
         return exists;
     } catch (error) {
-        console.error("Error checking date: ", error);
         throw error;
     }
 };
@@ -666,7 +647,7 @@ export const addNewReportData = async (reportType, reportData) => {
                             if (!towerSnapshot.empty) {
                                 const towerData = towerSnapshot.docs[0].data();
                                 if (!towerData.data.cancelled && reportData[key].cancelled) {
-                                    console.log("Cancelled order found");
+                                    
                                     await setDoc(towerSnapshot.docs[0].ref, { data: { ...towerData.data, cancelled: true } }, { merge: true });
                                 }
                             } else {
@@ -733,10 +714,8 @@ export const getConversionData = async (startDate, endDate) => {
             cmsData: await getCollectionData("cms", startDate, endDate),
             towerData: await getTowerData(startDate, endDate)
         };
-        console.log(conversionData);
         return conversionData;
     } catch (error) {
-        console.error("Error retrieving conversion data:", error);
         throw error;
     }
 };
@@ -759,7 +738,6 @@ export const getReportsByDate = async (startDate, endDate) => {
 
         return reports;
     } catch (error) {
-        console.error("Error retrieving reports:", error);
         throw error;
     }
 };
