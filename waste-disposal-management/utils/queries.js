@@ -647,7 +647,6 @@ export const addNewReportData = async (reportType, reportData) => {
                             if (!towerSnapshot.empty) {
                                 const towerData = towerSnapshot.docs[0].data();
                                 if (!towerData.data.cancelled && reportData[key].cancelled) {
-                                    
                                     await setDoc(towerSnapshot.docs[0].ref, { data: { ...towerData.data, cancelled: true } }, { merge: true });
                                 }
                             } else {

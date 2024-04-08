@@ -13,11 +13,12 @@ const KpiPieChart = ({ values, totalInquiries }) => {
 
     // Define color mapping for labels
     const colorMapping = {
-        "Lost/Other": "#ff5833",
-        "Fencing": "#3583cc",
-        "Junk Removal": "#a879d5",
-        "Roll Off": "#ffa600",
-        "Portable Toilet": "#fb67ad"
+        "Lost": "#ff5833",
+        "Follow Up": "#ffa998",
+        "Fencing": "#8dbb2a",
+        "Junk Removal": "#db6385",
+        "Roll Off": "#38b6a5",
+        "Portable Toilet": "#fdb57a"
     };
 
     // Prepare data for pie chart
