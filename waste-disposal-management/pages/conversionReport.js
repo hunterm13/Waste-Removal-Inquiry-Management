@@ -200,9 +200,8 @@ export default function ConversionReport() {
                             >
                                 <MenuItem value="Please Select a Report Type" disabled>Please Select a Report Type</MenuItem>
                                 <MenuItem value="telus">Telus</MenuItem>
-                                <MenuItem value="podium">Podium</MenuItem>
+                                <MenuItem value="podiumCms">Podium & CMS</MenuItem>
                                 <MenuItem value="tower">Tower</MenuItem>
-                                <MenuItem value="cms">CMS</MenuItem>
                             </Select>
                         </FormControl>
                         <Button variant="contained" style={{height:"fit-content"}}color="secondary" onClick={() => {setUploadingFile(false);}}>Cancel</Button>
