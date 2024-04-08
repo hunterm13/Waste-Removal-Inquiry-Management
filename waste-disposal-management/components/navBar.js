@@ -126,12 +126,12 @@ const Navbar = () => {
                             }}>Conversion Tool</Button>
                         </ListItem>
                         <ListItem sx={{padding:"0 16px 0 0"}}>
-                            <Button variant="text" component={Link} href="/allReports" sx={{
+                            <Button variant="text" component={Link} href="/followUps" sx={{
                                 color: "white",
                                 "&:hover": {
                                     color: "primary.main",
                                 },
-                            }}>All Reports</Button>
+                            }}>Follow Ups</Button>
                         </ListItem>
                         <ListItem sx={{padding:"0 16px 0 0"}}>
                             <Button variant="text" component={Link} href="/userManagement" sx={{

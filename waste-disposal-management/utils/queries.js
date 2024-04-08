@@ -740,3 +740,22 @@ export const getReportsByDate = async (startDate, endDate) => {
         throw error;
     }
 };
+
+export const getFollowUps = async () => {
+    const reportsRef = collection(db, "reports");
+    const q = query(
+        reportsRef,
+        where("leadTag", "==", "Follow Up")
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    const followUpReports = [];
+    querySnapshot.forEach((doc) => {
+        const newFollowUp = doc.data();
+        const reportWithId = { id: doc.id, ...newFollowUp };
+        followUpReports.push(reportWithId);
+    });
+
+    return followUpReports;
+};

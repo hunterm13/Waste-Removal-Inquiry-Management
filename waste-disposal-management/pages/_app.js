@@ -2,10 +2,15 @@
 import React from "react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material";
-import { Raleway } from "next/font/google";
+import { Raleway, Roboto } from "next/font/google";
 import  NavBar  from "../components/navBar";
 
 export const raleway = Raleway({
+    weight: "400",
+    subsets: ["latin"],
+  });
+
+export const roboto = Roboto({
     weight: "400",
     subsets: ["latin"],
   });
@@ -31,7 +36,17 @@ const theme = createTheme({
         },
       },
       typography: {
-        fontFamily: raleway.style.fontFamily,
+        fontFamily: roboto.style.fontFamily,
+        h1: {
+          fontFamily: raleway.style.fontFamily
+        },
+        h2: {
+            fontFamily: raleway.style.fontFamily
+        },
+        h3: {
+            fontFamily: raleway.style.fontFamily
+        },
+        
     },
 });
 
