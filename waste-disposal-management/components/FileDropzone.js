@@ -96,21 +96,7 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                 // Parse the file
                 const binaryStr = reader.result;
                 const workbook = XLSX.read(binaryStr, {type:"binary", cellStyles: true});
-                let sheetName;
-                switch(formType) {
-                    case "tower":
-                        sheetName = "Sheet1"; // replace with your sheet name
-                        break;
-                    case "telus":
-                        sheetName = "Calls"; // replace with your sheet name
-                        break;
-                    case "podiumCms":
-                        sheetName = "Leaderboard-310-DUMP Calgary-Em";
-                        break;
-                    default:
-                        console.log("Invalid formType: " + formType);
-                        return;
-                }
+                const sheetName = workbook.SheetNames[0];
 
                 const worksheet = workbook.Sheets[sheetName];
                 const jsonData = XLSX.utils.sheet_to_json(worksheet);
@@ -170,21 +156,19 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
         if(formType === "podiumCms") {
             const cmsData = uploadedFileData.slice(1).map(data => ({
                 name: data["Name"],
-                leads: data[" CMS"]
-            })).filter(data => data.leads !== 0);
+                leads: data["CMS"]
+            })).filter(data => data.leads !== 0 && data.leads !== undefined);
         
             const podiumData = uploadedFileData.slice(1).map(data => ({
                 name: data["Name"],
                 leads: data["POD"]
-            })).filter(data => data.leads !== 0);
-        
+            })).filter(data => data.leads !== 0 && data.leads !== undefined);
             setFileData({
                 date: formattedDate,
                 cmsData,
                 podiumData
             });
         }else if(formType === "telus") {
-            console.log(uploadedFileData);
             setFileData({
                 date: formattedDate,
                 ...uploadedFileData.reduce((acc, data) => {
