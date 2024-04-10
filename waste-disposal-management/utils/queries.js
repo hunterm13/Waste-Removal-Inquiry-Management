@@ -765,7 +765,7 @@ export const getUserReportsForLanding = async (userId) => {
     } catch (error) {
         throw error;
     }
-}
+};
 
 export const getReportsByMonth = async (date) => {
     try {
@@ -790,4 +790,4 @@ export const getReportsByMonth = async (date) => {
     } catch (error) {
         throw error;
     }
-}
+};

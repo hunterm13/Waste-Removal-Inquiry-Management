@@ -2,7 +2,7 @@ import React, { use, useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, Tooltip, TableHead, TableRow, Paper, CircularProgress, Button, TablePagination, Container, MenuItem, TextField, Select, Menu, Checkbox, Typography, FormControlLabel} from "@mui/material";
 import { getUserReportsForLanding, getReportsByMonth } from "../utils/queries";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const UserReportsTable = ({ uid }) => {
@@ -161,7 +161,7 @@ const UserReportsTable = ({ uid }) => {
                         <DatePicker                        
                             label="Search Month"
                             value={!searchMonth ? null : searchMonth}
-                            onChange={(newDate) => {setSearchMonth(newDate)}}
+                            onChange={(newDate) => {setSearchMonth(newDate);}}
                             views={["month", "year"]} 
                             disableFuture
                         />
