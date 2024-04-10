@@ -2,9 +2,12 @@ import React, { use, useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Button, TablePagination, Container, MenuItem, TextField, Select, Menu, Checkbox, Typography, FormControlLabel} from "@mui/material";
 import { getReportsByUserId } from "../utils/queries";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const UserReportsTable = ({ uid }) => {
     const [reports, setReports] = useState([]);
+    const [initialReportData, setInitialReportData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sortColumn, setSortColumn] = useState("dateReported");
     const [sortDirection, setSortDirection] = useState("desc");
@@ -13,6 +16,7 @@ const UserReportsTable = ({ uid }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [searchType, setSearchType] = useState("Inquiry Type");
     const [showOther, setShowOther] = useState(true);
+    const [searchMonth, setSearchMonth] = useState();
 
     useEffect(() => {
         const fetchUserReports = async () => {
@@ -20,6 +24,7 @@ const UserReportsTable = ({ uid }) => {
                 setLoading(true);
                 const userReports = await getReportsByUserId(uid);
                 setReports(userReports);
+                setInitialReportData(userReports);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching user reports:", error);
@@ -112,6 +117,15 @@ const UserReportsTable = ({ uid }) => {
                     <MenuItem value="Contact Name">Contact Name</MenuItem>
                     <MenuItem value="Site Name">Site Name</MenuItem>
                 </Select>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                        label="Month"
+                        value={!searchMonth ? null : searchMonth}
+                        onChange={(newDate) => {setSearchMonth(newDate)}}
+                        views={["month", "year"]} 
+                        disableFuture
+                    />
+                </LocalizationProvider>
             </Container>
             <Container maxWidth="xl" style={{padding:"0", marginBottom:"1rem", display:"flex", justifyContent: "end", alignItems: "center"}}>
                 <FormControlLabel control={<Checkbox checked={showOther} onChange={(event) => setShowOther(event.target.checked)} />} label='Show All Reports'/>
