@@ -1,6 +1,6 @@
 import { Container, Typography, Button, Select, TextField, MenuItem, FormControl, InputLabel, RadioGroup, FormLabel, FormControlLabel, Radio, Alert, AlertTitle } from "@mui/material";
 import { useEffect, useState } from "react";
-import { deleteReportById, updateReportById, updateReportsWithUserName } from "../../utils/queries";
+import { deleteReportById, updateReportById, updateReportsWithUserName, updateFollowUp } from "../../utils/queries";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Router, useRouter } from "next/router";
@@ -44,7 +44,7 @@ export default function FrontLoadReport({report, reportID}) {
             setFormattedDateUpdated(formatDateLocale(reportData.dateUpdated));
         }
     };
-    useEffect(() => {         
+    useEffect(() => {       
         updateTime();
     }, [reportData]);
 
@@ -98,6 +98,15 @@ export default function FrontLoadReport({report, reportID}) {
             setError("");
         }
     };
+
+    const followingUp = async () => {
+        const confirmFollowUp = window.confirm("Have you followed up with this lead?");
+        if (confirmFollowUp) {
+            const followUpCount = reportData.followUpCount ? reportData.followUpCount + 1 : 1;
+            updateFollowUp(reportID, reportData, followUpCount);
+        }
+    };
+
 
     function convertToDateObject(dateString) {
         const [month, day, year] = dateString.split("/").map(Number);
@@ -291,6 +300,7 @@ export default function FrontLoadReport({report, reportID}) {
                     <FormControl component="fieldset" sx={{ width: "30%" }}>
                         <FormLabel component="legend">Lead Channel</FormLabel>
                         <RadioGroup
+                            required
                             aria-label="Lead Channel"
                             name="leadChannel"
                             value={reportData.leadChannel}
@@ -302,6 +312,8 @@ export default function FrontLoadReport({report, reportID}) {
                             <FormControlLabel value="Podium" control={<Radio required={true}/>} label="Podium" />
                         </RadioGroup>
                     </FormControl>
+                </Container>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding:"0" }}>
                     <FormControl sx={{ width: "30%" }}>
                         <FormLabel component="legend">Lead Tag</FormLabel>
                         <RadioGroup
@@ -316,6 +328,32 @@ export default function FrontLoadReport({report, reportID}) {
                             <FormControlLabel value="Lost" control={<Radio required={true}/>} label="Lost" />
                         </RadioGroup>
                     </FormControl>
+                    {reportData.leadTag === "Lost" && (
+                        <FormControl sx={{ width: "30%" }}>
+                            <InputLabel id="reason-lost">Reason Lost *</InputLabel>
+                            <Select
+                                required
+                                label="Reason Lost"
+                                value={reportData.reasonLost}
+                                onChange={(event) => handleInputChange(event, "reasonLost")}
+                            >
+                                <MenuItem value="Price">Price</MenuItem>
+                                <MenuItem value="Competition">Competition</MenuItem>
+                                <MenuItem value="No Response">No Response</MenuItem>
+                                <MenuItem value="Other">Other</MenuItem>
+                            </Select>
+                        </FormControl>
+                    )}
+                    {reportData.reasonLost === "Other" && reportData.leadTag === "Lost" && (
+                        <FormControl sx={{ width: "30%" }}>
+                            <TextField
+                                required
+                                label="Other Reason Lost"
+                                value={reportData.otherReasonLost}
+                                onChange={(event) => handleInputChange(event, "otherReasonLost")}
+                            />
+                        </FormControl>
+                    )}
                 </Container>
                 <Container maxWidth="lg" style={{padding:"0", marginTop:"1rem"}}>
                     <FormControl sx={{ width: "100%" }}>
@@ -370,13 +408,22 @@ export default function FrontLoadReport({report, reportID}) {
                 {reportData.howHear !== "Other" ? <Typography variant="body1" component="h2">How did they hear about us? {reportData.howHear}</Typography> : <Typography variant="body1" component="h2">How did you hear about us? {reportData.otherHear}</Typography>}
                 <Typography variant="body1" component="h2">Lead Channel: {reportData.leadChannel}</Typography>
                 <Typography variant="body1" component="h2">Lead Tag: {reportData.leadTag}</Typography>
+                {reportData.leadTag === "Follow Up" ? <Button style={{width:"fit-content"}} onClick={followingUp} variant="contained">Followed Up With</Button> : null}
+                {reportData.leadTag === "Follow Up" ? 
+                    <>
+                        <Typography variant="body1" component="h2">Times Followed Up: {reportData.followUpCount ? reportData.followUpCount : "0"}</Typography>
+                        <Typography variant="body1" component="h2">Last Follow Up Date: {reportData.followUpDate ? formatDateLocale(reportData.followUpDate) : "N/A"}</Typography>
+                    </> : null
+                }
+                {reportData.leadTag === "Lost" && reportData.reasonLost !== "Other" ? <Typography variant="body1" component="h2">Reason Lost: {reportData.reasonLost}</Typography> : null}
+                {reportData.leadTag === "Lost" && reportData.reasonLost === "Other" ? <Typography variant="body1" component="h2">Reason Lost: {reportData.otherReasonLost}</Typography> : null}
                 {reportData.deliveryDate ? <Typography variant="body1" component="h2">Delivery Date: {reportData.deliveryDate}</Typography> : null}
                 {reportData.removalDate ? <Typography variant="body1" component="h2">Removal Date: {reportData.removalDate}</Typography> : null}
                 <Typography variant="body1" component="h2">Notes: {reportData.notes}</Typography>
             </Container>
             }
             <Container style={{display:"flex", padding:"0", justifyContent:"space-between", marginTop:"1rem"}}>
-                <Button variant="contained" href="/employeeLanding">Back to Reports</Button>
+                <Button variant="contained" onClick={() => (router.back())}>Back</Button>
                 <Container style={{margin:"0", width:"fit-content", display:"flex", gap:"1rem"}}>
                     {editing && <Button variant="contained" color="secondary" onClick={handleCancel}>Cancel</Button>}
                     <Button variant="contained" onClick={handleEdit}>{editing ? "Save" : "Edit"}</Button>                    

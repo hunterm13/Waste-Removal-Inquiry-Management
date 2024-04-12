@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Select, MenuItem, InputLabel, CircularProgress, FormControlLabel, Checkbox, Container, Typography, FormControl, Button } from "@mui/material";
 import { getAllUserID, getUserFirstName, getUserLastName, getAdminStatus } from "../utils/queries";
-import KpiReport from "./KpiReport";
+import LostReport from "./LostReport";
 
-export default function KpiReportGenerator({startDate, endDate}) {
+export default function LostReportGenerator({startDate, endDate}) {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
     const [employee, setEmployee] = useState("");
     const [service, setService] = useState("");
-    const [leadTag, setLeadTag] = useState("");
+    const [reason, setReason] = useState("");
     const [leadChannel, setLeadChannel] = useState("");
     const [howHeard, setHowHeard] = useState("");
     const [region, setRegion] = useState("");
@@ -36,7 +36,7 @@ export default function KpiReportGenerator({startDate, endDate}) {
     const resetFilters = () => {
         setEmployee("");
         setService("");
-        setLeadTag("");
+        setReason("");
         setLeadChannel("");
         setHowHeard("");
         setRegion("");
@@ -92,17 +92,18 @@ export default function KpiReportGenerator({startDate, endDate}) {
                     </Select>
                 </FormControl>                
                 <FormControl sx={{width: "12%"}}>
-                    <InputLabel id="outcome">Outcome</InputLabel>
+                    <InputLabel id="Reason">Reason</InputLabel>
                     <Select
-                        labelId="outcome"
-                        label={"Outcome"}
-                        onChange={(e) => setLeadTag(e.target.value)}
-                        value={leadTag}
+                        labelId="reason"
+                        label={"Reason"}
+                        onChange={(e) => setReason(e.target.value)}
+                        value={reason}
                     >
-                        <MenuItem value={""}>All Outcomes</MenuItem>
-                        <MenuItem value={"Booked"}>Booked</MenuItem>
-                        <MenuItem value={"Follow Up"}>Follow Up</MenuItem>
-                        <MenuItem value={"Lost"}>Lost</MenuItem>
+                        <MenuItem value={""}>All Reasons</MenuItem>
+                        <MenuItem value={"Price"}>Price</MenuItem>
+                        <MenuItem value={"Competition"}>Competition</MenuItem>
+                        <MenuItem value={"No Response"}>No Response</MenuItem>
+                        <MenuItem value={"Other"}>Other</MenuItem>
                     </Select>
                 </FormControl>
                 <FormControl sx={{width: "11%"}}>
@@ -154,7 +155,7 @@ export default function KpiReportGenerator({startDate, endDate}) {
             </Container>
         </Container>
         <Container maxWidth="xl" style={{display:"flex", justifyContent:"center", alignItems:"center", marginBottom:"4rem"}}>
-            <KpiReport employee={employee} users={users} service={service} leadTag={leadTag} leadChannel={leadChannel} howHeard={howHeard} region={region} adminsFiltered={adminsFiltered} startDate={startDate} endDate={endDate} />
+            <LostReport employee={employee} users={users} service={service} reasonLost={reason} leadChannel={leadChannel} howHeard={howHeard} region={region} adminsFiltered={adminsFiltered} startDate={startDate} endDate={endDate} />
         </Container>
     </Container>
     </>;

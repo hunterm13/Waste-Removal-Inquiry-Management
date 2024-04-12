@@ -1,7 +1,6 @@
 import { Container, Typography, CircularProgress, Grid, Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getAllReports } from "../utils/queries";
-import dayjs from "dayjs";
 
 export default function KpiReport({employee, users, service, leadTag, leadChannel, howHeard, region, adminsFiltered, startDate, endDate}) {
     const [loading, setLoading] = useState(true);
