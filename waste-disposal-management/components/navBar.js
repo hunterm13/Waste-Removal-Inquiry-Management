@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AppBar, Toolbar, IconButton, Drawer, List, ListItem, Button, Container, Switch } from "@mui/material";
+import { AppBar, Toolbar, IconButton, Drawer, List, ListItem, Button, Container, Switch, Typography } from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon, LightMode, DarkMode } from "@mui/icons-material";
 import { auth } from "../utils/firebaseConfig";
 import Link from "next/link";
@@ -93,8 +93,9 @@ const Navbar = () => {
                         }}>
                             <CloseIcon/>
                         </IconButton>
+                        <Typography variant="h6" component="h2" underline sx={{padding:"0 16px 0 0"}}>Employee Tools</Typography>
                         <ListItem sx={{padding:"0 16px 0 0"}}>
-                            <Button variant="text" component={Link} href="/employeeLanding" sx={{
+                            <Button variant="text" style={{textDecoration:"underline"}} component={Link} href="/employeeLanding" sx={{
                                 color: "white",
                                 "&:hover": {
                                     color: "primary.main",
@@ -102,7 +103,7 @@ const Navbar = () => {
                             }}>Dashboard</Button>
                         </ListItem>
                         <ListItem sx={{padding:"0 16px 0 0"}}>
-                            <Button variant="text" component={Link} href="/dailyTracker" sx={{
+                            <Button variant="text" style={{textDecoration:"underline"}} component={Link} href="/dailyTracker" sx={{
                                 color: "white",
                                 "&:hover": {
                                     color: "primary.main",
@@ -110,7 +111,16 @@ const Navbar = () => {
                             }}>Daily Tracker</Button>
                         </ListItem>
                         <ListItem sx={{padding:"0 16px 0 0"}}>
-                            <Button variant="text" component={Link} href="/teamReports" sx={{
+                            <Button variant="text" style={{textDecoration:"underline"}} component={Link} href="/followUps" sx={{
+                                color: "white",
+                                "&:hover": {
+                                    color: "primary.main",
+                                },
+                            }}>Follow Ups</Button>
+                        </ListItem>
+                        <Typography variant="h6" component="h2" underline sx={{padding:"0 16px 0 0"}}>Admin Tools</Typography>
+                        <ListItem sx={{padding:"0 16px 0 0"}}>
+                            <Button variant="text" style={{textDecoration:"underline"}} component={Link} href="/teamReports" sx={{
                                 color: "white",
                                 "&:hover": {
                                     color: "primary.main",
@@ -118,7 +128,7 @@ const Navbar = () => {
                             }}>KPI Summary</Button>
                         </ListItem>
                         <ListItem sx={{padding:"0 16px 0 0"}}>
-                            <Button variant="text" component={Link} href="/conversionReport" sx={{
+                            <Button variant="text" style={{textDecoration:"underline"}} component={Link} href="/conversionReport" sx={{
                                 color: "white",
                                 "&:hover": {
                                     color: "primary.main",
@@ -126,15 +136,15 @@ const Navbar = () => {
                             }}>Conversion Tool</Button>
                         </ListItem>
                         <ListItem sx={{padding:"0 16px 0 0"}}>
-                            <Button variant="text" component={Link} href="/followUps" sx={{
+                            <Button variant="text" style={{textDecoration:"underline"}} component={Link} href="/lostReports" sx={{
                                 color: "white",
                                 "&:hover": {
                                     color: "primary.main",
                                 },
-                            }}>Follow Ups</Button>
+                            }}>Lost Reports</Button>
                         </ListItem>
                         <ListItem sx={{padding:"0 16px 0 0"}}>
-                            <Button variant="text" component={Link} href="/userManagement" sx={{
+                            <Button variant="text" style={{textDecoration:"underline"}} component={Link} href="/userManagement" sx={{
                                 color: "white",
                                 "&:hover": {
                                     color: "primary.main",

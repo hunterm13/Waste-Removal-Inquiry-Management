@@ -1,9 +1,7 @@
 import { Box, Menu, Select, TextField, MenuItem, FormControl, InputLabel, Container, RadioGroup, Button, FormLabel, FormControlLabel, Radio, Typography, Alert, AlertTitle } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
-import { GoogleMap, useJsApiLoader, } from "@react-google-maps/api";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { newReport } from "../utils/queries";
 
 export default function NewReport({ userID, reportType }) {
@@ -19,9 +17,7 @@ export default function NewReport({ userID, reportType }) {
             event.returnValue = "";
             }
         };
-    
         window.addEventListener("beforeunload", handleBeforeUnload);
-    
         return () => {
             window.removeEventListener("beforeunload", handleBeforeUnload);
         };
@@ -59,6 +55,8 @@ export default function NewReport({ userID, reportType }) {
                 howHear: "",
                 otherHowHear: "",
                 binSize: "",
+                reasonLost: "",
+                otherReasonLost: "",
             });
         } else if (reportType === "Front Load") {
             setReport({
@@ -283,6 +281,7 @@ export default function NewReport({ userID, reportType }) {
                     <FormControl component="fieldset" sx={{ width: "30%" }}>
                         <FormLabel component="legend">Lead Channel</FormLabel>
                         <RadioGroup
+                            required
                             aria-label="Lead Channel"
                             name="leadChannel"
                             value={report.leadChannel}
@@ -294,6 +293,8 @@ export default function NewReport({ userID, reportType }) {
                             <FormControlLabel value="Podium" control={<Radio required={true}/>} label="Podium" />
                         </RadioGroup>
                     </FormControl>
+                </Container>
+                <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding:"0" }}>
                     <FormControl sx={{ width: "30%" }}>
                         <FormLabel component="legend">Lead Tag</FormLabel>
                         <RadioGroup
@@ -308,6 +309,32 @@ export default function NewReport({ userID, reportType }) {
                             <FormControlLabel value="Lost" control={<Radio required={true}/>} label="Lost" />
                         </RadioGroup>
                     </FormControl>
+                    {report.leadTag === "Lost" && (
+                        <FormControl sx={{ width: "30%" }}>
+                            <InputLabel id="reason-lost">Reason Lost *</InputLabel>
+                            <Select
+                                required
+                                label="Reason Lost"
+                                value={report.reasonLost}
+                                onChange={(event) => handleInputChange(event, "reasonLost")}
+                            >
+                                <MenuItem value="Price">Price</MenuItem>
+                                <MenuItem value="Competition">Competition</MenuItem>
+                                <MenuItem value="No Response">No Response</MenuItem>
+                                <MenuItem value="Other">Other</MenuItem>
+                            </Select>
+                        </FormControl>
+                    )}
+                    {report.reasonLost === "Other" && (
+                        <FormControl sx={{ width: "30%" }}>
+                        <TextField
+                        required
+                        label="Other Reason Lost"
+                        value={report.otherReasonLost}
+                        onChange={(event) => handleInputChange(event, "otherReasonLost")}
+                        />
+                    </FormControl>
+                    )}
                 </Container>
                 <Container maxWidth="lg" style={{padding:"0", marginTop:"1rem"}}>
                     <FormControl sx={{ width: "100%" }}>

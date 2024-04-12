@@ -51,11 +51,11 @@ export default function Home() {
         let oneFollowUps = [];
         let twoFollowUps = [];
         reports.forEach(report => {
-            if (report.followUps === 0) {
+            if (report.followUpCount === 0) {
                 noFollowUps.push(report);
-            } else if (report.followUps === 1) {
+            } else if (report.followUpCount === 1) {
                 oneFollowUps.push(report);
-            } else if (report.followUps === 2) {
+            } else if (report.followUpCount === 2) {
                 twoFollowUps.push(report);
             } else {
                 noFollowUps.push(report);

@@ -103,6 +103,12 @@ export const newReport = async (reportData, newReportType) => {
             if (reportData.service === "Roll Off" && !reportData.binSize) {
                 throw new Error("Bin size is missing");
             }
+            if (reportData.leadTag === "Lost" && !reportData.reasonLost) {
+                throw new Error("Reason for lost lead is missing");
+            }
+            if (reportData.leadTag === "Lost" && reportData.reasonLost === "Other" && !reportData.otherReasonLost) {
+                throw new Error("Reason for lost lead is missing");
+            }
             if (reportData.siteNumber && reportData.siteNumber.toLowerCase().trim() !== "na") {
                 reportData.siteNumber = reportData.siteNumber.replace(/\s/g, "");
             }
@@ -214,6 +220,10 @@ export const updateReportById = async (reportId, reportData) => {
                 throw new Error("How they heard about us is missing");
             } else if (reportData.service === "Roll Off" && !reportData.binSize) {
                 throw new Error("Bin size is missing");
+            } else if (reportData.leadTag === "Lost" && !reportData.reasonLost) {
+                throw new Error("Reason for lost lead is missing");
+            } else if (reportData.leadTag === "Lost" && reportData.reasonLost === "Other" && !reportData.otherReasonLost) {
+                throw new Error("Reason for lost lead is missing");
             } else if (!reportData.service || !reportData.workFlow || !reportData.city || !reportData.region || !reportData.siteName || !reportData.siteAddress || !reportData.contactEmail || !reportData.leadChannel || !reportData.leadTag || !reportData.siteNumber || !reportData.howHear) {
                 throw new Error("Required fields are missing");
             } else if (!reportData.siteNumber) {
@@ -758,4 +768,15 @@ export const getFollowUps = async () => {
     });
 
     return followUpReports;
+};
+
+export const updateFollowUp = async (reportId, reportData, followUpCount) => {
+    try {
+        const reportRef = doc(db, "reports", reportId);
+        reportData.followUpDate = serverTimestamp();
+        reportData.followUpCount = followUpCount;
+        await setDoc(reportRef, reportData, { merge: true });
+    } catch (error) {
+        throw error;
+    }
 };
