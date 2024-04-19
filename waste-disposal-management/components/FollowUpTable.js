@@ -109,6 +109,21 @@ const FollowUpTable = ({reports}) => {
             <Table>
                 <TableHead sx={{backgroundColor: "#333333"}}>
                     <TableRow>
+                    <TableCell 
+                            onClick={() => handleSort("userName")}
+                            style={{
+                                fontWeight: "bold", 
+                                fontSize: "1.5rem",
+                                cursor: "pointer",
+                                verticalAlign: "middle",
+                                whiteSpace: "nowrap",
+                                width: "13%",
+                            }}>
+                            User Name
+                            {sortColumn === "userName" && (
+                                sortDirection === "asc" ? <KeyboardArrowUp style={{ verticalAlign: "middle", margin: 0, padding: 0 }} /> : <KeyboardArrowDown style={{ verticalAlign: "middle", margin: 0, padding: 0 }} />
+                            )}
+                        </TableCell>
                         <TableCell 
                             onClick={() => handleSort("service")}
                             style={{
@@ -171,21 +186,6 @@ const FollowUpTable = ({reports}) => {
                             )}
                         </TableCell>
                         <TableCell
-                            onClick={() => handleSort("siteName")}
-                            style={{ 
-                                borderLeft: "1px solid rgba(81,81,81,1)",
-                                fontWeight: "bold", 
-                                fontSize: "1.5rem",
-                                cursor: "pointer",
-                                verticalAlign: "middle",
-                                whiteSpace: "nowrap",
-                            }}>
-                            Business Name
-                            {sortColumn === "siteName" && (
-                                sortDirection === "asc" ? <KeyboardArrowUp style={{ verticalAlign: "middle", margin: 0, padding: 0 }} /> : <KeyboardArrowDown style={{ verticalAlign: "middle", margin: 0, padding: 0 }} />
-                            )}
-                        </TableCell>
-                        <TableCell
                             onClick={() => handleSort("contactEmail")}
                             style={{ 
                                 borderLeft: "1px solid rgba(81,81,81,1)",
@@ -219,7 +219,9 @@ const FollowUpTable = ({reports}) => {
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         .map((report) => {
                             return (
-                                <TableRow key={report.id}><TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.service || report.reportType}</TableCell>
+                                <TableRow key={report.id}>
+                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.userName}</TableCell>
+                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.service || report.reportType}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.dateReported.toDate().toLocaleDateString()}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>
                                         <Tooltip title={report.siteNumber} placement="top">
@@ -229,7 +231,6 @@ const FollowUpTable = ({reports}) => {
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.contactName}</TableCell>
-                                    <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.siteName}</TableCell>
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>{report.contactEmail}</TableCell>
                                     
                                     <TableCell style={{ borderLeft: "1px solid rgba(81,81,81,1)" }}>
