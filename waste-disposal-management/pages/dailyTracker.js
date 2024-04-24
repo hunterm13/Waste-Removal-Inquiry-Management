@@ -31,6 +31,9 @@ export default function DailyTracker() {
                 if (!adminStatus) {
                     const firstName = await getUserFirstName(user);
                     const lastName = await getUserLastName(user);
+                    if(firstName === "Sales" && lastName === "Center"){
+                        return;
+                    }
                     return [user, `${firstName} ${lastName}`];
                 }
             }));
