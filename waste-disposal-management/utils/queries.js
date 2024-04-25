@@ -1,4 +1,4 @@
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, limit } from "firebase/firestore";
 import { db, auth } from "./firebaseConfig";
 import { collection, query, where, getDocs, addDoc, serverTimestamp, setDoc, Timestamp } from "firebase/firestore";
 import { deleteDoc } from "firebase/firestore";
@@ -713,8 +713,6 @@ const getTowerData = async (startDate, endDate) => {
     return data;
 };
 
-
-
 export const getConversionData = async (startDate, endDate) => {
     try {
         const conversionData = {
@@ -734,6 +732,57 @@ export const getReportsByDate = async (startDate, endDate) => {
         const reportsRef = collection(db, "reports");
         const startTimestamp = Timestamp.fromDate(new Date(startDate));
         const endTimestamp = Timestamp.fromDate(new Date(endDate));
+
+        const q = query(reportsRef, where("dateReported", ">=", startTimestamp), where("dateReported", "<=", endTimestamp));
+        const querySnapshot = await getDocs(q);
+
+        const reports = [];
+        querySnapshot.forEach((doc) => {
+            const reportData = doc.data();
+            const reportWithId = { id: doc.id, ...reportData };
+            reports.push(reportWithId);
+        });
+
+        return reports;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getUserReportsForLanding = async (userId) => {
+    try {
+        const reportsRef = collection(db, "reports");
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 7);
+        const q = query(
+            reportsRef,
+            where("userID", "==", userId),
+            where("dateReported", ">=", startDate),
+            limit(50)
+        );
+        const querySnapshot = await getDocs(q);
+
+        const reports = [];
+        querySnapshot.forEach((doc) => {
+            const reportData = doc.data();
+            const reportWithId = { id: doc.id, ...reportData };
+            reports.push(reportWithId);
+        });
+
+        return reports;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getReportsByMonth = async (date) => {
+    try {
+        const reportsRef = collection(db, "reports");
+        const month = date.month(); // getMonth returns month index starting from 0
+        const year = date.year();
+
+        const startTimestamp = Timestamp.fromDate(new Date(year, month, 1));
+        const endTimestamp = Timestamp.fromDate(new Date(year, month + 1, 0));
 
         const q = query(reportsRef, where("dateReported", ">=", startTimestamp), where("dateReported", "<=", endTimestamp));
         const querySnapshot = await getDocs(q);
