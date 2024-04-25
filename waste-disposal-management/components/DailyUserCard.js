@@ -3,7 +3,7 @@ import { Container, Typography } from "@mui/material";
 
 export default function DailyUserCard({userName, reports}) {
     return (
-        <Container maxWidth="md" style={{borderRadius:"1rem", backgroundColor:"darkgrey", padding:"1rem", boxShadow:"8px 8px 11px 0px rgba(0,0,0,0.4)"}}>
+        <Container maxWidth="md" style={{borderRadius:"1rem", backgroundColor:"#666666", padding:"1rem", boxShadow:"8px 8px 11px 0px rgba(0,0,0,0.4)"}}>
             <Typography variant="h4" component="h2" align="center">
                 {userName}
             </Typography>

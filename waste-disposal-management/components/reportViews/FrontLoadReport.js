@@ -77,7 +77,7 @@ export default function FrontLoadReport({report, reportID}) {
                     <Typography>{reportData.notes}</Typography>
                 </Container>}            
             <Container style={{display:"flex", padding:"0", justifyContent:"space-between", marginTop:"1rem"}}>
-                <Button variant="contained" href="/employeeLanding">Back to Reports</Button>
+                <Button variant="contained" onClick={() => (router.back())}>Back</Button>
                 <Container style={{margin:"0", width:"fit-content", display:"flex", gap:"1rem"}}>
                     {editing && <Button variant="contained" color="alert" onClick={handleCancel}>Cancel</Button>}
                     <Button variant="contained" onClick={handleEdit}>{editing ? "Save" : "Edit"}</Button>                    
