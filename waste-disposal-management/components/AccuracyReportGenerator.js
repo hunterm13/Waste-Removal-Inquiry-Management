@@ -269,13 +269,13 @@ export default function AccuracyReportGenerator({startDate, endDate}) {
                         <TableCell style={{borderRight:"2px solid black"}} align="right">{towerData.filter(item => item.data.workFlow === "DELIVERRO" && item.data.region == "Calgary").length}</TableCell>
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{towerData.filter(item => item.data.workFlow === "SERVICEJR").length}</TableCell>
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{towerData.filter(item => item.data.workFlow === "SERVICEJR" && item.data.region == "Edmonton").length}</TableCell>
-                        <TableCell style={{borderRight:"2px solid black"}} align="right">{towerData.filter(item => item.data.workFlow === "SERVICEJR" && item.data.region == "Edmonton").length}</TableCell>
+                        <TableCell style={{borderRight:"2px solid black"}} align="right">{towerData.filter(item => item.data.workFlow === "SERVICEJR" && item.data.region == "Calgary").length}</TableCell>
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{towerData.filter(item => item.data.workFlow === "DELPT").length}</TableCell>
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{towerData.filter(item => item.data.workFlow === "DELPT" && item.data.region == "Edmonton").length}</TableCell>
-                        <TableCell style={{borderRight:"2px solid black"}} align="right">{towerData.filter(item => item.data.workFlow === "DELPT" && item.data.region == "Edmonton").length}</TableCell>
+                        <TableCell style={{borderRight:"2px solid black"}} align="right">{towerData.filter(item => item.data.workFlow === "DELPT" && item.data.region == "Calgary").length}</TableCell>
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{towerData.filter(item => item.data.workFlow === "DELFENCING").length}</TableCell>
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{towerData.filter(item => item.data.workFlow === "DELFENCING" && item.data.region == "Edmonton").length}</TableCell>
-                        <TableCell style={{borderRight:"2px solid black"}} align="right">{towerData.filter(item => item.data.workFlow === "DELFENCING" && item.data.region == "Edmonton").length}</TableCell>
+                        <TableCell style={{borderRight:"2px solid black"}} align="right">{towerData.filter(item => item.data.workFlow === "DELFENCING" && item.data.region == "Calgary").length}</TableCell>
                         <TableCell style={{borderRight:"2px solid black", fontWeight:"Bold"}} align="right">{towerData.length}</TableCell>
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{podiumLeads}</TableCell>
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{cmsLeads}</TableCell>

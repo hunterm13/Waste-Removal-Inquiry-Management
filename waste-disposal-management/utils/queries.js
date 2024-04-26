@@ -661,10 +661,17 @@ export const addNewReportData = async (reportType, reportData) => {
                                 }
                             } else {
                                 // Check for duplicates before adding a new document
-                                const duplicateQuery = query(towerRef, where("data", "==", reportData[key]));
+                                // Check for duplicates before adding a new document
+                                const duplicateQuery = query(
+                                    towerRef,
+                                    where("data.workFlow", "==", reportData[key].workFlow),
+                                    where("data.name", "==", reportData[key].name),
+                                    where("data.orderDate", "==", reportData[key].orderDate)
+                                );
                                 const duplicateSnapshot = await getDocs(duplicateQuery);
                                 if (duplicateSnapshot.empty) {
                                     if (["DELIVERRO", "DELPT", "DELFENCING", "SERVICEJR"].includes(reportData[key].workFlow)) {
+                                        console.log(reportData[key]);
                                         await addDoc(towerRef, { data: reportData[key] });
                                     }
                                 }

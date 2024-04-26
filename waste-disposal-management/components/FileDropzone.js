@@ -65,8 +65,8 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
         if (fileData && Object.keys(fileData).length !== 0) {             
             const uploadReportData = async () => {
                 try{
-                    await addNewReportData(formType, fileData);
                     console.log(fileData);
+                    await addNewReportData(formType, fileData);                    
                     setFileData({});
                     setSuccess(true);
                     setUploadingFile(false);
@@ -190,15 +190,23 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
         }else if(formType === "tower") {
             setFileData({
                 date: formattedDate,
-                ...uploadedFileData.map(data => ({
-                    cancelled: data["Cancelled"],
-                    siteName: data["Site Name"],
-                    workFlow: data["Workflow"],
-                    orderDate: data["Order Date"],
-                    name: data["Order Taken By"],
-                    region: data["Region"],
-                })).filter(data => data.Region !== undefined)
-            });
+                ...uploadedFileData.map(data => {
+                    let workFlow = data["Workflow"];
+                    if (workFlow === "SERVICE-JR") {
+                        workFlow = "SERVICEJR";
+                    }
+                    const newData = {
+                        cancelled: data["Cancelled"],
+                        siteName: data["Site Name"],
+                        workFlow: workFlow,
+                        orderDate: data["Order Date"],
+                        name: data["Order Taken By"],
+                        region: data["Region"],
+                    };
+                    console.log(newData);
+                    return newData;
+                }).filter(data => data.region !== undefined)
+            });            
         }else{
             alert("Invalid form type. Please select a valid form type.");
         }
