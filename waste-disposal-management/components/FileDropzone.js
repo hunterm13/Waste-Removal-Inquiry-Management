@@ -96,7 +96,12 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                 // Parse the file
                 const binaryStr = reader.result;
                 const workbook = XLSX.read(binaryStr, {type:"binary", cellStyles: true});
-                const sheetName = workbook.SheetNames[0];
+                let sheetName = "";
+                if (formType == "telus") {
+                    sheetName = "Calls";
+                } else {
+                    sheetName = workbook.SheetNames[0];
+                }
 
                 const worksheet = workbook.Sheets[sheetName];
                 const jsonData = XLSX.utils.sheet_to_json(worksheet);
@@ -109,6 +114,7 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                     });
                     const filteredData = updatedData.filter(item => item.CellColor === "FF99CC" || item.CellColor === "CCFFFF");
                     setUploadedFileData(filteredData);
+                    console.log(filteredData);
                     setFileUploaded(true);
                 }
                 else{
@@ -191,8 +197,8 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                     orderDate: data["Order Date"],
                     name: data["Order Taken By"],
                     region: data["Region"],
-                }))
-            });
+                })).filter(data => data.Region !== undefined)
+            })
         }else{
             alert("Invalid form type. Please select a valid form type.");
         }
