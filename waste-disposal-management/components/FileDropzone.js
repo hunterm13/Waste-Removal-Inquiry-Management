@@ -198,7 +198,7 @@ export default function FileDropzone({formType, setSuccess, setUploadingFile}) {
                     name: data["Order Taken By"],
                     region: data["Region"],
                 })).filter(data => data.Region !== undefined)
-            })
+            });
         }else{
             alert("Invalid form type. Please select a valid form type.");
         }
