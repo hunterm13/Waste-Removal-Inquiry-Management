@@ -22,9 +22,7 @@ export default function Home() {
                 try {
                     setLoading(true);
                     const userReports = await getFollowUps();
-                    filterReports(userReports).then(filteredReports => {
-                        organizeReports(filteredReports);
-                    });
+                    organizeReports(userReports);
                     setLoading(false);
                 } catch (error) {
                     console.error("Error fetching user reports:", error);
@@ -37,13 +35,13 @@ export default function Home() {
         return () => unregisterAuthObserver(); 
     }, []);
 
-    const filterReports = async (reports) => {
-        let filteredReports = reports.filter((report) => {
-            let dateReported = report.dateReported.toDate();
-            return dateReported < olderThan;
-        });
-        return filteredReports;
-    };
+    // const filterReports = async (reports) => {
+    //     let filteredReports = reports.filter((report) => {
+    //         let dateReported = report.dateReported.toDate();
+    //         return dateReported < olderThan;
+    //     });
+    //     return filteredReports;
+    // };
     
 
     const organizeReports = async (reports) => {
