@@ -67,8 +67,8 @@ const UserReportsTable = ({ uid }) => {
                 switch (searchType) {
                     case "Inquiry Type":
                         return report.service && report.service.toLowerCase().includes(searchTerm.toLowerCase());
-                    case "City":
-                        return report.city && report.city.toLowerCase().includes(searchTerm.toLowerCase());
+                    case "Email":
+                        return report.contactEmail && report.contactEmail.toLowerCase().includes(searchTerm.toLowerCase());
                     case "Contact Name":
                         return report.contactName && report.contactName.toLowerCase().includes(searchTerm.toLowerCase());
                     case "Site Name":
@@ -102,8 +102,8 @@ const UserReportsTable = ({ uid }) => {
         switch (searchType) {
             case "Inquiry Type":
                 return report.service && report.service.toLowerCase().includes(searchTerm.toLowerCase());
-            case "City":
-                return report.city && report.city.toLowerCase().includes(searchTerm.toLowerCase());
+            case "Email":
+                return report.contactEmail && report.contactEmail.toLowerCase().includes(searchTerm.toLowerCase());
             case "Contact Name":
                 return report.contactName && report.contactName.toLowerCase().includes(searchTerm.toLowerCase());
             case "Site Name":
@@ -149,8 +149,8 @@ const UserReportsTable = ({ uid }) => {
                     }}
                     value={searchType}
                 >
+                    <MenuItem value="Email">Email</MenuItem>
                     <MenuItem value="Inquiry Type">Inquiry Type</MenuItem>
-                    <MenuItem value="City">City</MenuItem>
                     <MenuItem value="Contact Name">Contact Name</MenuItem>
                     <MenuItem value="Site Name">Site Name</MenuItem>
                     <MenuItem value="Contact Number">Site Number</MenuItem>
