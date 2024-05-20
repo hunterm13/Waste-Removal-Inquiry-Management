@@ -14,7 +14,7 @@ const UserReportsTable = ({ uid }) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchTerm, setSearchTerm] = useState("");
-    const [searchType, setSearchType] = useState("Inquiry Type");
+    const [searchType, setSearchType] = useState("Email");
     const [showOther, setShowOther] = useState(true);
     const [searchMonth, setSearchMonth] = useState();
     const [customData, setCustomData] = useState();    

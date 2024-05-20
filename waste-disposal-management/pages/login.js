@@ -37,7 +37,6 @@ export default function Login() {
             await signInWithEmailAndPassword(auth, email, password);
             window.location.href = "/employeeLanding";
         } catch (error) {
-            console.log(error.code)
             switch (error.code) {                
                 case "auth/invalid-email":
                     setError("Invalid email address.");
