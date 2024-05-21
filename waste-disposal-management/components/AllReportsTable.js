@@ -1,6 +1,6 @@
 import React, { use, useEffect, useState } from "react";
 import { Table, TableBody, Tooltip, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Button, TablePagination, Container, MenuItem, TextField, Select, Menu, Checkbox, Typography, FormControlLabel} from "@mui/material";
-import { getAllReports } from "../utils/queries";
+import { getRecentReports } from "../utils/queries";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 
 const AllReportsTable = () => {
@@ -19,7 +19,7 @@ const AllReportsTable = () => {
             try {
                 
                 setLoading(true);
-                const userReports = await getAllReports();
+                const userReports = await getRecentReports();
                 setReports(userReports);
                 setLoading(false);
             } catch (error) {

@@ -37,15 +37,18 @@ export default function Login() {
             await signInWithEmailAndPassword(auth, email, password);
             window.location.href = "/employeeLanding";
         } catch (error) {
-            switch (error.code) {
+            switch (error.code) {                
                 case "auth/invalid-email":
                     setError("Invalid email address.");
                     break;
-                case "auth/invalid-credential":
-                    setError("Incorrect login details.");
+                case "auth/invalid-login-credentials":
+                    setError("Incorrect login email or password.");
                     break;
                 case "auth/missing-password":
                     setError("Invalid password.");
+                    break;
+                case "auth/too-many-requests":
+                    setError("Too many login attempts. Please try again later.");
                     break;
                 default:
                     setError("Unknown error occurred. Please try again or contact support.");
