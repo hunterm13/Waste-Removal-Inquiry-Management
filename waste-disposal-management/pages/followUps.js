@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { auth } from "../utils/firebaseConfig";
-import { getAdminStatus, getFollowUps } from "../utils/queries";
-import { Container, Typography, CircularProgress, Grid } from "@mui/material";
+import { getFollowUps, getExtendedFollowUps } from "../utils/queries";
+import { Container, Typography, CircularProgress, Grid, Button } from "@mui/material";
 import FollowUpTable from "../components/FollowUpTable";
 
 export default function Home() {
@@ -12,6 +12,7 @@ export default function Home() {
     const [noFollowUps, setNoFollowUps] = useState([]);
     const [oneFollowUp, setOneFollowUp] = useState([]);
     const [twoFollowUps, setTwoFollowUps] = useState([]);
+    const [extendedFollowUps, setExtendedFollowUps] = useState(false);
 
     useEffect(() => {
         const unregisterAuthObserver = auth.onAuthStateChanged(async user => {
@@ -33,16 +34,33 @@ export default function Home() {
             fetchUserReports();
         });
         return () => unregisterAuthObserver(); 
-    }, []);
+    }, []);   
 
-    // const filterReports = async (reports) => {
-    //     let filteredReports = reports.filter((report) => {
-    //         let dateReported = report.dateReported.toDate();
-    //         return dateReported < olderThan;
-    //     });
-    //     return filteredReports;
-    // };
-    
+    const getOlderReports = async () => {
+        if(!extendedFollowUps) {
+            try {
+                setLoading(true);
+                const userReports = await getExtendedFollowUps();
+                organizeReports(userReports);
+                setLoading(false);
+                setExtendedFollowUps(!extendedFollowUps);
+            } catch (error) {
+                console.error("Error fetching user reports:", error);
+                setLoading(false);
+            }
+        } else {
+            try {
+                setLoading(true);
+                const userReports = await getFollowUps();
+                organizeReports(userReports);
+                setLoading(false);
+                setExtendedFollowUps(!extendedFollowUps);
+            } catch (error) {
+                console.error("Error fetching user reports:", error);
+                setLoading(false);
+            }  
+        }
+    };
 
     const organizeReports = async (reports) => {
         let noFollowUps = [];
@@ -79,9 +97,12 @@ export default function Home() {
                 Outstanding Follow Ups
             </Typography>
             <Container maxWidth="xl" style={{margin:"2rem 0"}}>
-                <Typography variant="h4" component="h2">
-                    No Follow Ups
-                </Typography>
+                <Container maxWidth="xl" style={{padding:"0", margin:"0", display:"flex", justifyContent:"space-between"}}>
+                    <Typography variant="h4" component="h2">
+                        No Follow Ups
+                    </Typography>
+                    <Button onClick={getOlderReports} style={{margin:"0"}} variant="contained" color="primary">{extendedFollowUps ? "Show only 14 Days" : "Extend to 30 Days"}</Button>
+                </Container>
                 <FollowUpTable reports={noFollowUps}/>
             </Container>
             <Container maxWidth="xl" style={{margin:"2rem 0"}}>

@@ -758,14 +758,18 @@ export const getReportsByDate = async (startDate, endDate) => {
 
 export const getUserReportsForLanding = async (userId) => {
     try {
-        const reportsRef = collection(db, "reports");
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - 7);
-        const q = query(
-            reportsRef,
-            where("userID", "==", userId),
-            where("dateReported", ">=", startDate),
-            limit(50)
+      const reportsRef = collection(db, "reports");
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 7);
+  
+      // Convert startDate to Firestore timestamp
+      const timestampStartDate = Timestamp.fromDate(startDate);
+  
+      const q = query(
+        reportsRef,
+        where("userID", "==", userId),
+        where("dateReported", ">=", timestampStartDate),
+        limit(50)
         );
         const querySnapshot = await getDocs(q);
 
@@ -809,9 +813,36 @@ export const getReportsByMonth = async (date) => {
 
 export const getFollowUps = async () => {
     const reportsRef = collection(db, "reports");
+    const currentDate = new Date();
+    const thirtyDaysAgo = Timestamp.fromDate(new Date(currentDate.getTime() - 14 * 24 * 60 * 60 * 1000));
+
     const q = query(
         reportsRef,
-        where("leadTag", "==", "Follow Up")
+        where("leadTag", "==", "Follow Up"),
+        where("dateReported", ">=", thirtyDaysAgo)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    const followUpReports = [];
+    querySnapshot.forEach((doc) => {
+        const newFollowUp = doc.data();
+        const reportWithId = { id: doc.id, ...newFollowUp };
+        followUpReports.push(reportWithId);
+    });
+
+    return followUpReports;
+};
+
+export const getExtendedFollowUps = async () => {
+    const reportsRef = collection(db, "reports");
+    const currentDate = new Date();
+    const thirtyDaysAgo = Timestamp.fromDate(new Date(currentDate.getTime() - 30 * 24 * 60 * 60 * 1000));
+
+    const q = query(
+        reportsRef,
+        where("leadTag", "==", "Follow Up"),
+        where("dateReported", ">=", thirtyDaysAgo)
     );
 
     const querySnapshot = await getDocs(q);
