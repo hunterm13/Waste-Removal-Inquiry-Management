@@ -768,7 +768,6 @@ export const getUserReportsForLanding = async (userId) => {
         const q = query(
             reportsRef,
             where("userID", "==", userId),
-            where("dateReported", ">=", timestampStartDate),
             orderBy("dateReported", "desc"), // Sort by dateReported in descending order
             limit(50)
         );
