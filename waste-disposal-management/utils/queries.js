@@ -759,16 +759,13 @@ export const getReportsByDate = async (startDate, endDate) => {
 export const getUserReportsForLanding = async (userId) => {
     try {
       const reportsRef = collection(db, "reports");
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - 7);
-  
-      // Convert startDate to Firestore timestamp
-      const timestampStartDate = Timestamp.fromDate(startDate);
-  
+      const currentDate = new Date();
+      const startDate = Timestamp.fromDate(new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000));
+
       const q = query(
         reportsRef,
         where("userID", "==", userId),
-        where("dateReported", ">=", timestampStartDate),
+        where("dateReported", ">=", startDate),
         limit(50)
         );
         const querySnapshot = await getDocs(q);
