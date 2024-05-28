@@ -75,6 +75,8 @@ export const getAdminStatus = async (userId) => {
     }
 };
 
+
+
 export const newReport = async (reportData, newReportType) => {
     let firstName = await getUserFirstName(reportData.userID);
     let lastName = await getUserLastName(reportData.userID);

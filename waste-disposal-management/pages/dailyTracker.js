@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { db } from "../utils/firebaseConfig";
 import { collection, query, orderBy, onSnapshot, where } from "firebase/firestore";
 import { CircularProgress, Container, Typography, Grid } from "@mui/material";
-import { getAllUserID, getAdminStatus, getUserFirstName, getUserLastName } from "../utils/queries";
+import { getAllUserID, getAdminStatus, getActiveStatus, getUserFirstName, getUserLastName } from "../utils/queries";
 import DailyUserCard from "../components/DailyUserCard";
 import KpiPieChart from "../components/KpiPieChart";
 import { Kulim_Park } from "next/font/google";
@@ -27,8 +27,9 @@ export default function DailyTracker() {
         const getUsers = async (newReports) => {
             const response = await getAllUserID();
             const updatedResponse = await Promise.all(response.map(async user => {
-                const adminStatus = await getAdminStatus(user);
-                if (!adminStatus) {
+                const isAdmin = await getAdminStatus(user);
+                const isActive = await getActiveStatus(user);
+                if (!isAdmin && isActive) {
                     const firstName = await getUserFirstName(user);
                     const lastName = await getUserLastName(user);
                     if(firstName === "Sales" && lastName === "Center"){
