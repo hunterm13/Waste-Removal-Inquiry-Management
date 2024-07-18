@@ -16,7 +16,7 @@ const UserReportsTable = ({ uid }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [searchType, setSearchType] = useState("Email");
     const [showOther, setShowOther] = useState(true);
-    const [searchMonth, setSearchMonth] = useState();
+    const [searchMonth, setSearchMonth] = useState();   
     const [customData, setCustomData] = useState();    
 
     useEffect(() => {

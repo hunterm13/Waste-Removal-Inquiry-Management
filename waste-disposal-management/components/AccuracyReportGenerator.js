@@ -159,7 +159,7 @@ export default function AccuracyReportGenerator({startDate, endDate}) {
                     <TableRow sx={{backgroundColor:"#111111"}}>
                         <TableCell sx={{backgroundColor:"#333333"}}></TableCell>
                         <TableCell style={{borderRight:"2px solid grey",borderLeft:"2px solid black"}} align="center" colSpan={17}>Jobs Completed Per Tower</TableCell>
-                        <TableCell style={{borderRight:"2px solid grey",borderLeft:"2px solid black"}} align="center" colSpan={39}>Agent Data</TableCell>
+                        <TableCell style={{borderRight:"2px solid grey",borderLeft:"2px solid black"}} align="center" colSpan={40}>Agent Data</TableCell>
                         <TableCell style={{borderRight:"2px solid grey",borderLeft:"2px solid black"}} align="center" colSpan={8}>Agent Data Verification</TableCell>
                     </TableRow>
                     <TableRow sx={{backgroundColor:"#222222"}}>
@@ -167,7 +167,7 @@ export default function AccuracyReportGenerator({startDate, endDate}) {
                         <TableCell style={{borderRight:"2px solid black",borderLeft:"2px solid black"}} align="center" colSpan={13}>Jobs Completed</TableCell>
                         <TableCell colSpan={3} align="center">Leads Taken</TableCell>
                         <TableCell rowSpan={3} style={{borderLeft:"2px solid black", borderRight:"2px solid black"}} align="center">Total Leads</TableCell>
-                        <TableCell colSpan={13} style={{borderRight:"2px solid black"}} align="center">Inbound Sales Calls</TableCell>
+                        <TableCell colSpan={14} style={{borderRight:"2px solid black"}} align="center">Inbound Sales Calls</TableCell>
                         <TableCell colSpan={13} style={{borderRight:"2px solid black"}} align="center">Podium Leads</TableCell>
                         <TableCell colSpan={13} style={{borderRight:"2px solid black"}} align="center">CMS Leads</TableCell>                        
                         <TableCell colSpan={2} rowSpan={2} style={{borderRight:"2px solid black"}} align="center">Call Difference</TableCell>
@@ -189,6 +189,7 @@ export default function AccuracyReportGenerator({startDate, endDate}) {
                         <TableCell colSpan={3} align="center" style={{borderLeft:"2px solid black",borderRight:"1px solid grey", padding:"0.5rem"}}>JR</TableCell>
                         <TableCell colSpan={3} align="center" style={{borderLeft:"2px solid black",borderRight:"1px solid grey", padding:"0.5rem"}}>PT</TableCell>
                         <TableCell colSpan={3} align="center" style={{borderLeft:"2px solid black",borderRight:"2px solid black", padding:"0.5rem"}}>FE</TableCell>
+                        <TableCell align="center" style={{borderLeft:"2px solid black",borderRight:"2px solid black", padding:"0.5rem"}} rowSpan={2}>Other</TableCell>
                         <TableCell rowSpan={2} align="Center" style={{borderLeft:"2px solid black",borderRight:"2px solid black"}}>Total Calls</TableCell>
                         <TableCell colSpan={3} align="center" style={{borderLeft:"2px solid black",borderRight:"1px solid grey", padding:"0.5rem"}}>RO</TableCell>
                         <TableCell colSpan={3} align="center" style={{borderLeft:"2px solid black",borderRight:"1px solid grey", padding:"0.5rem"}}>JR</TableCell>
@@ -293,7 +294,8 @@ export default function AccuracyReportGenerator({startDate, endDate}) {
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{filteredReportData.filter(item => item.leadChannel === "Phone" && item.workFlow === "DELFE").length}</TableCell>
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{filteredReportData.filter(item => item.leadChannel === "Phone" && item.workFlow === "DELFE" && item.region === "Edmonton").length}</TableCell>
                         <TableCell style={{borderRight:"2px solid black"}} align="right">{filteredReportData.filter(item => item.leadChannel === "Phone" && item.workFlow === "DELFE" && item.region === "Calgary").length}</TableCell>
-                        <TableCell style={{borderRight:"2px solid black", fontWeight:"Bold"}} align="right">{filteredReportData.filter(item => ["DELIVERRO", "SERVICEJR", "DELPT", "DELFE"].includes(item.workFlow) && item.leadChannel === "Phone").length}</TableCell>
+                        <TableCell style={{borderRight:"2px solid black"}} align="right">{filteredReportData.filter(item => item.service === "Other").length}</TableCell>
+                        <TableCell style={{borderRight:"2px solid black", fontWeight:"Bold"}} align="right">{filteredReportData.filter(item => ["DELIVERRO", "SERVICEJR", "DELPT", "DELFE"].includes(item.workFlow) && item.leadChannel === "Phone").length + filteredReportData.filter(item => item.service === "Other").length}</TableCell>
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{filteredReportData.filter(item => item.leadChannel === "Podium" && item.workFlow === "DELIVERRO").length}</TableCell>
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{filteredReportData.filter(item => item.leadChannel === "Podium" && item.workFlow === "DELIVERRO" && item.region === "Edmonton").length}</TableCell>
                         <TableCell style={{borderRight:"2px solid black"}} align="right">{filteredReportData.filter(item => item.leadChannel === "Podium" && item.workFlow === "DELIVERRO" && item.region === "Calgary").length}</TableCell>
@@ -320,13 +322,13 @@ export default function AccuracyReportGenerator({startDate, endDate}) {
                         <TableCell style={{borderRight:"1px solid grey"}} align="right">{filteredReportData.filter(item => item.leadChannel === "CMS" && item.workFlow === "DELFE" && item.region === "Edmonton").length}</TableCell>
                         <TableCell style={{borderRight:"2px solid black"}} align="right">{filteredReportData.filter(item => item.leadChannel === "CMS" && item.workFlow === "DELFE" && item.region === "Calgary").length}</TableCell>
                         <TableCell style={{borderRight:"2px solid black", fontWeight:"Bold"}} align="right">{filteredReportData.filter(item => ["DELIVERRO", "SERVICEJR", "DELPT", "DELFE"].includes(item.workFlow) && item.leadChannel === "CMS").length}</TableCell>
-                        <TableCell style={{borderRight:"1px solid grey"}} align="right">{filteredReportData.filter(item => ["DELIVERRO", "SERVICEJR", "DELPT", "DELFE"].includes(item.workFlow) && item.leadChannel === "Phone").length - telusLeads}</TableCell>
+                        <TableCell style={{borderRight:"1px solid grey"}} align="right">{(filteredReportData.filter(item => ["DELIVERRO", "SERVICEJR", "DELPT", "DELFE"].includes(item.workFlow) && item.leadChannel === "Phone").length + filteredReportData.filter(item => item.service === "Other").length) - telusLeads}</TableCell>
                         <TableCell style={{borderRight:"2px solid black"}} align="right">
                             {(() => {
                                 if (telusLeads === 0) {
                                     return "0%";
                                 } else {
-                                    const percentage = ((filteredReportData.filter(item => ["DELIVERRO", "SERVICEJR", "DELPT", "DELFE"].includes(item.workFlow) && item.leadChannel === "Phone").length / telusLeads) * 100).toFixed(1);
+                                    const percentage = (((filteredReportData.filter(item => ["DELIVERRO", "SERVICEJR", "DELPT", "DELFE"].includes(item.workFlow) && item.leadChannel === "Phone").length + filteredReportData.filter(item => item.service === "Other").length) / telusLeads) * 100).toFixed(1);
                                     return isNaN(percentage) ? "0%" : `${percentage}%`;
                                 }
                             })()}
