@@ -97,9 +97,9 @@ export default function KpiReport({employee, users, service, leadTag, leadChanne
         const allPossibleValues = { // replace with actual possible values
             "userID": [...usersMap.keys()],
             "service": service ? [service] : ["Roll Off", "Junk Removal", "Portable Toilet", "Fencing", "Front Load", "Swap", "Removal", "Other"],
-            "leadTag": leadTag ? [leadTag] : ["Booked", "Follow Up", "Lost"],
-            "leadChannel": leadChannel ? [leadChannel] : ["CMS", "Podium", "Phone"],
-            "howHear": howHeard ? [howHeard] : ["Kijiji", "Google", "Word of Mouth", "Other", "Facebook"],
+            "leadTag": leadTag ? [leadTag] : ["Booked", "Follow Up", "Lost", "N/A"],
+            "leadChannel": leadChannel ? [leadChannel] : ["CMS", "Podium", "Phone", "N/A"],
+            "howHear": howHeard ? [howHeard] : ["Kijiji", "Google", "Word of Mouth", "Other", "Facebook", "N/A"],
             "region": region ? [region] : ["Edmonton", "Calgary"]
         };
         const countByField = (field) => {

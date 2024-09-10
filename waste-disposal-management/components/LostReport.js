@@ -106,9 +106,9 @@ export default function LostReport({employee, users, service, reasonLost, leadCh
         const allPossibleValues = { // replace with actual possible values
             "userID": [...usersMap.keys()],
             "service": service ? [service] : ["Roll Off", "Junk Removal", "Portable Toilet", "Fencing"],
-            "reasonLost": reasonLost ? [reasonLost] : ["Price", "Competition", "No Response", "Other"],
-            "leadChannel": leadChannel ? [leadChannel] : ["CMS", "Podium", "Phone"],
-            "howHear": howHeard ? [howHeard] : ["Kijiji", "Google", "Word of Mouth", "Other", "Facebook"],
+            "reasonLost": reasonLost ? [reasonLost] : ["Price", "Competition", "No Response", "Other", "N/A"],
+            "leadChannel": leadChannel ? [leadChannel] : ["CMS", "Podium", "Phone", "N/A"],
+            "howHear": howHeard ? [howHeard] : ["Kijiji", "Google", "Word of Mouth", "Other", "Facebook", "N/A"],
             "region": region ? [region] : ["Edmonton", "Calgary"]
         };
         const countByField = (field) => {
