@@ -2,7 +2,6 @@ import {useState, useEffect} from "react";
 import  ProtectedRoute  from "../components/ProtectedRoute";
 import { Button, CircularProgress, Container, Typography, Select, MenuItem } from "@mui/material";
 import { auth } from "../utils/firebaseConfig";
-import { getUserFirstName } from "../utils/queries";
 import NewReport from "../components/NewReport";
 
 export default function EmployeeLanding() {

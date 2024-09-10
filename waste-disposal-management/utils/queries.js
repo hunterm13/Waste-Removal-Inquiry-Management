@@ -84,34 +84,32 @@ export const newReport = async (reportData, newReportType) => {
     if(newReportType === "insideSale") {
         try {
             const newReportRef = collection(db, "reports");
+            if (!reportData.service) {
+                throw new Error("Service type is required.");
+            }
             if (
                 !reportData.service ||
-                !reportData.workFlow ||
-                !reportData.city ||
-                !reportData.region ||
-                !reportData.siteName ||
-                !reportData.siteAddress ||
-                !reportData.contactEmail ||
-                !reportData.leadChannel ||
-                !reportData.leadTag ||
-                !reportData.siteNumber ||
-                !reportData.howHear
+                !reportData.region
             ) {
-                throw new Error("Required fields are missing");
+                throw new Error("Required fields are missing.");
             }
-            if (reportData.howHeard === "Other" && !reportData.otherHowHear) {
-                throw new Error("How they heard about us is missing");
+            const fieldsToCheck = [
+                'city', 'siteName', 'siteAddress', 'howHear', 'contactName', 'contactEmail', 'leadChannel', 'leadTag', 'siteNumber', 'reasonLost', 'otherReasonLost'
+            ];
+        
+            // Loop through each field and set to "NA" if blank
+            fieldsToCheck.forEach(field => {
+                if (!reportData[field]) {
+                    reportData[field] = "N/A";
+                }
+            });
+            if(reportData.howHear == "Other" && !reportData.otherHowHear){
+                reportData.otherHowHear == "N/A"
             }
-            if (reportData.service === "Roll Off" && !reportData.binSize) {
-                throw new Error("Bin size is missing");
+            if(reportData.service == "Roll Off" && !reportData.binSize){
+                reportData.binSize == "N/A"
             }
-            if (reportData.leadTag === "Lost" && !reportData.reasonLost) {
-                throw new Error("Reason for lost lead is missing");
-            }
-            if (reportData.leadTag === "Lost" && reportData.reasonLost === "Other" && !reportData.otherReasonLost) {
-                throw new Error("Reason for lost lead is missing");
-            }
-            if (reportData.siteNumber && reportData.siteNumber.toLowerCase().trim() !== "na") {
+            if (reportData.siteNumber && reportData.siteNumber.toLowerCase().trim() !== "N/A") {
                 reportData.siteNumber = reportData.siteNumber.replace(/\s/g, "");
             }
     
@@ -218,20 +216,32 @@ export const updateReportById = async (reportId, reportData) => {
               ...reportData,
               dateUpdated: serverTimestamp()
             };
-            if (reportData.howHeard === "Other" && !reportData.otherHowHear) {
-                throw new Error("How they heard about us is missing");
-            } else if (reportData.service === "Roll Off" && !reportData.binSize) {
-                throw new Error("Bin size is missing");
-            } else if (reportData.leadTag === "Lost" && !reportData.reasonLost) {
-                throw new Error("Reason for lost lead is missing");
-            } else if (reportData.leadTag === "Lost" && reportData.reasonLost === "Other" && !reportData.otherReasonLost) {
-                throw new Error("Reason for lost lead is missing");
-            } else if (!reportData.service || !reportData.workFlow || !reportData.city || !reportData.region || !reportData.siteName || !reportData.siteAddress || !reportData.contactEmail || !reportData.leadChannel || !reportData.leadTag || !reportData.siteNumber || !reportData.howHear) {
-                throw new Error("Required fields are missing");
-            } else if (!reportData.siteNumber) {
-                throw new Error("Phone number is missing");
-            } else
-            if (reportData.siteNumber && reportData.siteNumber.toLowerCase().trim() !== "na") {
+            if (!reportData.service) {
+                throw new Error("Service type is required.");
+            }
+            if (
+                !reportData.service ||
+                !reportData.region
+            ) {
+                throw new Error("Required fields are missing.");
+            }
+            const fieldsToCheck = [
+                'city', 'siteName', 'siteAddress', 'howHear', 'contactName', 'contactEmail', 'leadChannel', 'leadTag', 'siteNumber', 'reasonLost', 'otherReasonLost'
+            ];
+        
+            // Loop through each field and set to "NA" if blank
+            fieldsToCheck.forEach(field => {
+                if (!reportData[field]) {
+                    reportData[field] = "N/A";
+                }
+            });
+            if(reportData.howHear == "Other" && !reportData.otherHowHear){
+                reportData.otherHowHear == "N/A"
+            }
+            if(reportData.service == "Roll Off" && !reportData.binSize){
+                reportData.binSize == "N/A"
+            }
+            if (reportData.siteNumber && reportData.siteNumber.toLowerCase().trim() !== "N/A") {
                 reportData.siteNumber = reportData.siteNumber.replace(/\s/g, "");
             }
             await setDoc(reportRef, updatedData, { merge: true });

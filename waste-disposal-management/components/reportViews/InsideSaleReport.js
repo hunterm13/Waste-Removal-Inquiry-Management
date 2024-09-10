@@ -196,12 +196,11 @@ export default function FrontLoadReport({report, reportID}) {
                         </Select>
                     </FormControl>
                     {reportData.service === "Roll Off" ? <FormControl style={{display:"flex", flexWrap:"nowrap", flexDirection:"row", alignItems:"center", gap:"1rem"}} sx={{width:"50%"}}>
-                        <FormLabel id="binSize">Bin Size (Yards) * :</FormLabel>
+                        <FormLabel id="binSize">Bin Size (Yards):</FormLabel>
                         <RadioGroup
                             label={"Bin Size (Yards)"}
                             labelId="binSize"
                             value={reportData.binSize}
-                            required
                             style={{ display: "flex", flexDirection: "row" }}
                             onChange={(event) => handleInputChange(event, "binSize")}
                         >
@@ -217,7 +216,8 @@ export default function FrontLoadReport({report, reportID}) {
                     <FormControl  sx={{width:"25%"}}>
                         <InputLabel id="region">Region *</InputLabel>
                         <Select 
-                            required id="region"
+                            required
+                            id="region"
                             value={reportData.region}
                             onChange={(event) => handleInputChange(event, "region")}
                             label={"Region"}
@@ -229,7 +229,7 @@ export default function FrontLoadReport({report, reportID}) {
                     </FormControl>
                     <FormControl  sx={{width:"40%"}}>
                         <TextField
-                            required
+                            
                             label="Address"
                             value={reportData.siteAddress}
                             onChange={(event) => handleInputChange(event, "siteAddress")}
@@ -237,7 +237,6 @@ export default function FrontLoadReport({report, reportID}) {
                     </FormControl>
                     <FormControl  sx={{width:"25%"}}>
                         <TextField
-                            required
                             label="City"
                             value={reportData.city}
                             onChange={(event) => handleInputChange(event, "city")}
@@ -247,7 +246,7 @@ export default function FrontLoadReport({report, reportID}) {
                 <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding:"0" }}>
                     <FormControl  sx={{width:"30%"}}>
                         <TextField
-                            required
+                            
                             helperText="If not available, enter 'NA'"
                             label="Contact Number"
                             value={reportData.siteNumber}
@@ -263,7 +262,7 @@ export default function FrontLoadReport({report, reportID}) {
                     </FormControl>
                     <FormControl  sx={{width:"30%"}}>
                         <TextField
-                            required
+                            
                             label="Contact Email"
                             value={reportData.contactEmail}
                             onChange={(event) => handleInputChange(event, "contactEmail")}
@@ -273,7 +272,7 @@ export default function FrontLoadReport({report, reportID}) {
                 <Container maxWidth="lg" style={{ display: "flex", justifyContent: "flex-start", gap: "2rem", marginTop: "1rem", padding:"0"}}>
                     <FormControl  sx={{width:"30%"}}>
                         <TextField
-                            required
+                            
                             label="Business Name"
                             value={reportData.siteName}
                             onChange={(event) => handleInputChange(event, "siteName")}
@@ -300,16 +299,16 @@ export default function FrontLoadReport({report, reportID}) {
                     <FormControl component="fieldset" sx={{ width: "30%" }}>
                         <FormLabel component="legend">Lead Channel</FormLabel>
                         <RadioGroup
-                            required
+                            
                             aria-label="Lead Channel"
                             name="leadChannel"
                             value={reportData.leadChannel}
                             onChange={(event) => handleInputChange(event, "leadChannel")}
                             style={{ display: "flex", flexDirection: "row" }}
                         >
-                            <FormControlLabel value="Phone" control={<Radio required={true}/>} label="Phone" />
-                            <FormControlLabel value="CMS" control={<Radio required={true}/>} label="CMS" />
-                            <FormControlLabel value="Podium" control={<Radio required={true}/>} label="Podium" />
+                            <FormControlLabel value="Phone" control={<Radio/>} label="Phone" />
+                            <FormControlLabel value="CMS" control={<Radio/>} label="CMS" />
+                            <FormControlLabel value="Podium" control={<Radio/>} label="Podium" />
                         </RadioGroup>
                     </FormControl>
                 </Container>
@@ -323,16 +322,15 @@ export default function FrontLoadReport({report, reportID}) {
                             onChange={(event) => handleInputChange(event, "leadTag")}
                             style={{ display: "flex", flexDirection: "row" }}
                         >
-                            <FormControlLabel value="Follow Up" control={<Radio required={true}/>} label="Follow Up" />
-                            <FormControlLabel value="Booked" control={<Radio required={true}/>} label="Booked" />
-                            <FormControlLabel value="Lost" control={<Radio required={true}/>} label="Lost" />
+                            <FormControlLabel value="Follow Up" control={<Radio/>} label="Follow Up" />
+                            <FormControlLabel value="Booked" control={<Radio/>} label="Booked" />
+                            <FormControlLabel value="Lost" control={<Radio/>} label="Lost" />
                         </RadioGroup>
                     </FormControl>
                     {reportData.leadTag === "Lost" && (
                         <FormControl sx={{ width: "30%" }}>
-                            <InputLabel id="reason-lost">Reason Lost *</InputLabel>
+                            <InputLabel id="reason-lost">Reason Lost</InputLabel>
                             <Select
-                                required
                                 label="Reason Lost"
                                 value={reportData.reasonLost}
                                 onChange={(event) => handleInputChange(event, "reasonLost")}
@@ -347,7 +345,7 @@ export default function FrontLoadReport({report, reportID}) {
                     {reportData.reasonLost === "Other" && reportData.leadTag === "Lost" && (
                         <FormControl sx={{ width: "30%" }}>
                             <TextField
-                                required
+                                
                                 label="Other Reason Lost"
                                 value={reportData.otherReasonLost}
                                 onChange={(event) => handleInputChange(event, "otherReasonLost")}
@@ -358,7 +356,7 @@ export default function FrontLoadReport({report, reportID}) {
                 <Container maxWidth="lg" style={{padding:"0", marginTop:"1rem"}}>
                     <FormControl sx={{ width: "100%" }}>
                         <TextField
-                            required
+                            
                             multiline
                             label="Notes"
                             value={reportData.notes}
@@ -373,7 +371,7 @@ export default function FrontLoadReport({report, reportID}) {
                             labelId="how-hear-label"
                             id="how-hear-select"
                             label="How did they hear about us?"
-                            required
+                            
                             value={reportData.howHear}
                             onChange={(event) => handleInputChange(event, "howHear")}
                         >
@@ -387,7 +385,7 @@ export default function FrontLoadReport({report, reportID}) {
                     {reportData.howHear === "other" && (
                     <FormControl sx={{ width: "40%" }}>
                         <TextField
-                        required
+                        
                         label="Other"
                         value={reportData.otherHowHear}
                         onChange={(event) => handleInputChange(event, "otherHowHear")}
