@@ -91,14 +91,6 @@ export default function AdminPage() {
                                 <MenuItem value='email'>Email</MenuItem>                                
                             </Select>
                         </Container>
-                        <Button 
-                            variant='contained'
-                            color='primary'
-                            style={{ textWrap:"nowrap", height:"fit-content" }}
-                            href='/newUser'
-                        >
-                            Add User
-                        </Button>
                     </Container>
                     <TableContainer component={Paper}>
                         <Table>

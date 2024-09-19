@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Alert, FormControl, AlertTitle, CircularProgress, Container, Button, Typography, TextField, FormControlLabel, Switch, InputLabel } from "@mui/material";
-import { getUserDetails, getAdminStatus, deleteUserByID } from "../../utils/queries";
+import { getUserDetails, getAdminStatus, deleteUserByID, updateUserByID } from "../../utils/queries";
 import { auth } from "../../utils/firebaseConfig";
 
 export default function User() {
@@ -14,6 +14,16 @@ export default function User() {
     const [ error, setError ] = useState("");
     const [ editing, setEditing ] = useState(false);
     const [ isFormDirty, setIsFormDirty ] = useState(false);
+    const [initialUser, setInitialUser] = useState(null);
+    const isInitialLoad = useRef(true);
+    const [errorTimeout, setErrorTimeout] = useState(null);
+
+    useEffect(() => {
+        if (error) {
+            setErrorTimeout(setTimeout(() => setError(""), 5000)); // Set error message to disappear after 5 seconds
+        }
+        return () => clearTimeout(errorTimeout); // Clear timeout when component unmounts
+    }, [error]);
 
     useEffect(() => {
         const unregisterAuthObserver = auth.onAuthStateChanged(async user => {
@@ -32,31 +42,45 @@ export default function User() {
     useEffect(() => {
         if (isAuthInitialized) {
             const fetchUser = async () => {
-                try{
+                try {
                     const userData = await getUserDetails(userID);
                     setUser(userData);
+                    setInitialUser(userData); // Set initial user data
                     setLoading(false);
+                    isInitialLoad.current = false; // Set to false after data is loaded
                 } catch (error) {
-                    setError("Error fetching user details");
+                    
                 }
             };
             fetchUser();
         }
-    }, [isAuthInitialized]);
+    }, [isAuthInitialized, userID]);
 
-    const handleSave = () => {
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setUser({ ...user, [name]: value }); // Update user state with new value
+        setIsFormDirty(true); // Update isFormDirty state
+    };
+
+    const handleSave = async () => {
         if (editing && isFormDirty) {
             const confirmSave = window.confirm("Are you sure you want to save changes?");
             if (confirmSave) {
-                // save changes
-                setEditing(false);
-                setIsFormDirty(false);
-                setError("");
+                try {
+                    // Save changes
+                    await updateUserByID(userID, user);
+                    setEditing(false);
+                    setIsFormDirty(false);
+                    setError("");
+                } catch (error) {
+                    setError("Error saving changes: " + error.message);
+                }
             }
         } else {
             setEditing(!editing);
         }
     };
+    
 
     const handleDelete = async () => {
         const confirmDelete = window.confirm("Are you sure you want to delete the user? This action cannot be undone.");
@@ -72,9 +96,11 @@ export default function User() {
     };
 
     const handleEdit = () => {
-        if(editing && isFormDirty){
+        if (editing && isFormDirty) {
             const confirmCancel = window.confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
             if (confirmCancel) {
+                setUser(initialUser); // Reset user data to initial state
+                setIsFormDirty(false); // Reset isFormDirty state to false
                 setEditing(false);
             }
         } else if (!editing) {
@@ -116,10 +142,12 @@ export default function User() {
 
     return (
         <Container maxWidth="lg">
+            <div style={{minHeight:"70px"}}>
             {error && 
                 <Alert severity='error' sx={{ marginBottom: 2 }}>
                     <AlertTitle>{error}</AlertTitle>
                 </Alert>}
+                </div>
             <Typography variant="h2" component="h1" align="center">
                 User Details
             </Typography>
@@ -127,50 +155,44 @@ export default function User() {
                 <Button variant="contained" color="error" disabled onClick={handleDelete}>Delete User</Button>
             </Typography>
             {editing ? (
-                <form>
-                    <FormControl style={{marginTop: "1rem"}}>
+                <form style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div style={{ display: "flex", gap: "2rem", justifyContent: "center", marginBottom: "2rem" }}>
+                    <FormControl>
                         <TextField
                             label="First Name"
+                            name="firstName" // Add name attribute
                             value={user.firstName}
-                            onChange={(event) => setUser({...user, firstName: event.target.value})}
+                            onChange={handleInputChange}
                             required
                         />
                     </FormControl>
-                    <FormControl style={{ marginTop: "1rem" }}>
-                        <TextField
-                            label="First Name"
-                            value={user.firstName}
-                            onChange={(event) => setUser({ ...user, firstName: event.target.value })}
-                            required
-                        />
-                    </FormControl>
-                    <FormControl style={{ marginTop: "1rem" }}>
+                    <FormControl>
                         <TextField
                             label="Last Name"
+                            name="lastName" // Add name attribute
                             value={user.lastName}
-                            onChange={(event) => setUser({ ...user, lastName: event.target.value })}
+                            onChange={handleInputChange}
                             required
                         />
                     </FormControl>
-                    <FormControl style={{ marginTop: "1rem"}} >
-                        <TextField
-                            label="Email"
-                            value={user.email}
-                            onChange={(event) => setUser({ ...user, email: event.target.value })}
-                            required
-                        />
-                    </FormControl>
+                </div>
+                <div style={{ display: "flex", gap: "2rem", justifyContent: "center" }}>
                     <FormControlLabel
-                        style={{ marginTop: "1rem" }}
-                        control={<Switch checked={user.active} onChange={(event) => setUser({ ...user, active: event.target.checked })} />}
+                        control={<Switch checked={user.active} onChange={(event) => {
+                            setUser({ ...user, active: event.target.checked }); // Update user state with new value
+                            setIsFormDirty(true); // Update isFormDirty state
+                        }} />}
                         label="Active"
                     />
                     <FormControlLabel
-                        style={{ marginTop: "1rem" }}
-                        control={<Switch checked={user.admin} onChange={(event) => setUser({ ...user, admin: event.target.checked })} />}
+                        control={<Switch checked={user.admin} onChange={(event) => {
+                            setUser({ ...user, admin: event.target.checked }); // Update user state with new value
+                            setIsFormDirty(true); // Update isFormDirty state
+                        }} />}
                         label="Admin"
                     />
-                </form>
+                </div>
+            </form>
             ) : (
                 <Container style={{padding:"0", marginTop:"2rem"}}>
                     <Typography variant="h5" component="h3" style={{marginTop:"1rem"}}>
@@ -178,9 +200,6 @@ export default function User() {
                     </Typography>
                     <Typography variant="h5" component="h3" style={{marginTop:"1rem"}}>
                         Last Name: {user.lastName}
-                    </Typography>
-                    <Typography variant="h5" component="h3" style={{marginTop:"1rem"}}>
-                        Email: {user.email}
                     </Typography>
                     <Typography variant="h5" component="h3" style={{marginTop:"1rem"}}>
                         Active: {user.active ? "Yes" : "No"}
@@ -196,7 +215,7 @@ export default function User() {
                     <Button variant="contained" color={!editing ? "primary" : "secondary"} onClick={handleEdit}>
                         {!editing ? "Edit" : "Cancel"}
                     </Button>
-                    {editing && <Button variant="contained" color="tertiary" onClick={handleSave}>Save</Button>}
+                    {editing && <Button variant="contained" disabled={!isFormDirty} color="tertiary" onClick={handleSave}>Save</Button>}
                 </Container>
             </Container>
         </Container>
