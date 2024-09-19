@@ -1,8 +1,9 @@
-import { doc, getDoc, limit } from "firebase/firestore";
+import { doc, getDoc, limit, updateDoc } from "firebase/firestore";
 import { db, auth } from "./firebaseConfig";
 import { collection, query, where, getDocs, addDoc, orderBy, serverTimestamp, setDoc, Timestamp } from "firebase/firestore";
 import { deleteDoc } from "firebase/firestore";
 import { sendPasswordResetEmail, createUserWithEmailAndPassword } from "firebase/auth";
+import { TrySharp } from "@mui/icons-material";
 
 export const getUserFirstName = async (userId) => {
     try {
@@ -414,6 +415,35 @@ export const deleteUserByID = async (userId) => {
     }
 };
 
+export const updateUserByID = async (userId, userData) => {
+    try {
+        const userRef = doc(db, "Users", userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            const { firstName, lastName, active, admin } = userData;
+
+            // Check if the user is active before making them an admin
+            if (admin && !active) {
+                throw new Error("User cannot be an admin if they are not active.");
+            }
+
+            // Update the user data
+            await updateDoc(userRef, {
+                firstName: firstName,
+                lastName: lastName,
+                active: active,
+                admin: admin
+            });
+        } else {
+            throw new Error("User does not exist.");
+        }
+    } catch (error) {
+        throw error;
+    }
+};
+
+
 export const getActiveStatus = async (userId) => {
     try {
         const userRef = doc(db, "Users", userId);
@@ -464,6 +494,8 @@ export const disableUserByID = async (userId) => {
         throw error;
     }
 };
+
+
 
 export const getAllReports = async () => {
     try {
